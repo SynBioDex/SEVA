@@ -1,3 +1,7 @@
+import sys
+sys.path
+sys.path.append('/Users/bbartley/Dev/git/libSBOL/release/wrapper/Mac_64_2/sbol')
+
 from sbol import *
 
 SO_FIVE_PRIME_STICKY_END_RESTRICTION_ENZYME_CLEAVAGE_SITE = SO + "0001975"
@@ -17,6 +21,7 @@ class Cargo(ComponentDefinition, PythonicInterface):               # Inheriting 
         self.default_sequence = SEVA_VECTOR_DOC.sequences.create(id + '_seq')
         self.default_sequence.elements = 'TTAATTAAAGCGGATAACAATTTCACACAGGAGGCCGCCTAGGCCGCGGCCGCGCGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGGCATGCAAGCTTGCGGCCGCGTCGTGACTGGGAAAACCCTGGCGACTAGT'
         self.sequence = self.default_sequence
+        self.name = id
         sa = self.sequenceAnnotations.create('PacI')
         r = sa.locations.createRange('r')
         r.start = 1
@@ -156,6 +161,7 @@ class SEVAVector(ComponentDefinition, PythonicInterface):               # Inheri
         if type(origin_id) != int : raise Exception()
         if type(cargo) != Cargo : raise Exception()
         if not cargo : raise Exception()
+        self.name = id
 
         SEVA_selection_markers = {
                             1 : 'Ap',
@@ -233,6 +239,7 @@ class SEVAVector(ComponentDefinition, PythonicInterface):               # Inheri
         Config.setOption('sbol_compliant_uris', False)
         spacer = SEVA_VECTOR_DOC.componentDefinitions.create('http://seva.cnb.csic.es/cd/spacer') 
         spacer.displayId = 'spacer'       
+        spacer.name = 'spacer'
         spacer_seq = Sequence('http://seva.cnb.csic.es/seq/spacer', 'CAATAATTACG')
         spacer_seq.displayId = 'spacer'
         spacer.sequence = spacer_seq

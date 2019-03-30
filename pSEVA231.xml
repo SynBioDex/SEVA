@@ -5,6 +5,7 @@
    xmlns:sbol="http://sbols.org/v2#"
    xmlns:sys-bio="http://sys-bio.org#">
   <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/ComponentDefinition/cargo/1.0.0">
+    <dcterms:title>cargo</dcterms:title>
     <sbol:displayId>cargo</sbol:displayId>
     <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ComponentDefinition/cargo"/>
     <sbol:sequence rdf:resource="http://seva.cnb.csic.es/Sequence/cargo_seq/1.0.0"/>
@@ -488,6 +489,7 @@
     <prov:wasDerivedFrom rdf:resource="http://seva.cnb.csic.es/cd/pBBR1"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/ComponentDefinition/pSEVA231/1.0.0">
+    <dcterms:title>pSEVA231</dcterms:title>
     <sbol:component>
       <sbol:Component rdf:about="http://seva.cnb.csic.es/ComponentDefinition/pSEVA231/AscI_0/1.0.0">
         <sbol:access rdf:resource="http://sbols.org/v2#public"/>
@@ -1039,6 +1041,7 @@
     <prov:wasDerivedFrom rdf:resource="http://seva.cnb.csic.es/seq/seqpBBR1"/>
   </sbol:Sequence>
   <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/spacer">
+    <dcterms:title>spacer</dcterms:title>
     <sbol:displayId>spacer</sbol:displayId>
     <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/spacer"/>
     <sbol:sequence rdf:resource="http://seva.cnb.csic.es/http://seva.cnb.csic.es/seq/spacer"/>
