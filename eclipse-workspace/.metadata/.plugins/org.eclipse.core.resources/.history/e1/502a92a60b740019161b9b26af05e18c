@@ -1,0 +1,362 @@
+package com.bbn.FACETS;
+
+import org.junit.Test;
+import static org.junit.Assert.assertTrue;
+import org.sbolstandard.core2.AccessType;
+import org.sbolstandard.core2.Component;
+import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.DirectionType;
+import org.sbolstandard.core2.FunctionalComponent;
+import org.sbolstandard.core2.Interaction;
+import org.sbolstandard.core2.ModuleDefinition;
+import org.sbolstandard.core2.RefinementType;
+import org.sbolstandard.core2.RestrictionType;
+import org.sbolstandard.core2.SBOLConversionException;
+import org.sbolstandard.core2.SBOLDocument;
+import org.sbolstandard.core2.SBOLReader;
+import org.sbolstandard.core2.SBOLValidate;
+import org.sbolstandard.core2.SBOLValidationException;
+import org.sbolstandard.core2.SystemsBiologyOntology;
+import org.sbolstandard.core2.Sequence;
+import org.sbolstandard.core2.SequenceConstraint;
+import org.sbolstandard.core2.SequenceOntology;
+import org.springframework.util.Assert;
+import org.synbiohub.frontend.SynBioHubException;
+import org.synbiohub.frontend.SynBioHubFrontend;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+/**
+ * Test that the architecture of circuit construction is working as expected.
+ */
+public class TestMorphogen {
+    private Logger log = Logger.getGlobal();
+    private static final String PART_SHOP_PATH = "test_modules.xml";
+    private String DEFAULT_NAMESPACE = "https://bbn.com/FACETS";
+
+//    /**
+//     * Test that we can successfully grab module definitions from SynBioHub, along with their sub-elements.
+//     * @throws SBOLValidationException if the imported material is bad
+//     * @throws CircuitBuilderException if the imported material is the wrong type
+//     * @throws SynBioHubException if retrieval from SynBioHub fails
+//     * @throws URISyntaxException
+//     * @throws SBOLConversionException
+//     * @throws IOException
+//     */
+//    @Test
+//    public void testHEKCHOSortedBall() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: testHEKCHOSortedBall");
+//        setup();
+//        CircuitBuilder builder = new CircuitBuilder("testHEKCHOSortedBall");
+//        
+//        Map<String, ModulePorts> ports = Sorting.HEKCHOSortedBall(0.0001, 0.8);
+//        CircuitBuilder.instance().getDocument().write(System.out);
+//    }
+//
+//    @Test
+//    public void testHEKCHOWithFluorViaModulePorts() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: testHEKCHOWithFluorViaModulePorts");
+//        setup();
+//
+//        String builderName = "hekCho2ColorsModulePorts";
+//
+//        CircuitBuilder hekCho2Colors = new CircuitBuilder(builderName);
+//        ModulePorts hek = hekCho2Colors.instantiateModule(new URI(DEFAULT_NAMESPACE + "/HEK"));
+//        // ModuleDefinition hekSource = hek.getSource();  // other option for getting the ModuleDefinition.  either works
+//        ModulePorts cho = hekCho2Colors.instantiateModule(new URI(DEFAULT_NAMESPACE + "/CHO"));
+//        ModulePorts cho1 = hekCho2Colors.instantiateModule(new URI(DEFAULT_NAMESPACE + "/CHO"));
+//        log.info("num modules = " + hekCho2Colors.getSystem().getModules().size());
+//        assertTrue(hekCho2Colors.getSystem().getModules().size() == 2); // ensure that bfp isn't added twice.
+//
+//        ModulePorts rfp = Fluorescence.redWithInteraction(hek);
+//        ModulePorts bfp = Fluorescence.blueWithInteraction(cho);
+//
+//        hekCho2Colors.getDocument().write(System.out);
+//        boolean result = hekCho2Colors.validate();
+//        log.info("result = " + result);
+//        assertTrue(result);
+//    }
+//
+//    @Test
+//    public void prettyTestHEKCHOSortedBallWithFluourescence() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        setup();
+//
+//        CircuitBuilder builder = new CircuitBuilder("MorphogenTest");
+//        Map<String, ModulePorts> cellTypes = Sorting.HEKCHOSortedBall(0.0001, 0.8);
+//
+//        ModulePorts mkate = Fluorescence.redWithInteraction(cellTypes.get(Sorting.INTERIOR));
+//        ModulePorts bfp = Fluorescence.blueWithInteraction(cellTypes.get(Sorting.EXTERIOR));
+//
+//        assertTrue(CircuitBuilder.instance().validate());
+//    }
+//
+//    @Test
+//    public void testHEKCHOSortedBallWithFluourescence() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: testHEKCHOSortedBallWithFluourescence");
+//        setup();
+//
+//        CircuitBuilder builder = new CircuitBuilder("HekChoWithFluorescence");
+//        
+//        Map<String, ModulePorts> ports = Sorting.HEKCHOSortedBall(0.0001, 0.8);
+//        builder.getDocument().write(System.out);
+//        assertTrue(builder.getSystem().getModules().size() == 2); // ensure both modules added
+//
+//        ModulePorts mkate = Fluorescence.redWithInteraction(ports.get(Sorting.INTERIOR));
+//        builder.getDocument().write(System.out);
+//        assertTrue(builder.getSystem().getModules().size() == 3); // ensure that hek isn't added again, but mkate is
+//
+//        ModulePorts bfp = Fluorescence.blueWithInteraction(ports.get(Sorting.EXTERIOR));
+//        builder.getDocument().write(System.out);
+//        assertTrue(builder.getSystem().getModules().size() == 4); // ensure that cho isn't added again, but bfp is
+//
+//        boolean result = builder.validate();
+//        log.info("result = " + result);
+//        assertTrue(result);
+//    }
+//
+//    @Test
+//    public void testSecondOrderSorting() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: testSecondOrderSorting");
+//        setup();
+//        
+//        String builderName = "HEKAndTwiceSortedCHO";
+//        CircuitBuilder builder = new CircuitBuilder(builderName);
+//        Map<String, ModulePorts> sortedCells = Sorting.HEKCHOSortedBall(0.0001, 0.8); // hek is interior, cho is exterior
+//        ModulePorts hek = sortedCells.get(Sorting.INTERIOR); // Sorting.INTERIOR == "INTERIOR"
+//        ModulePorts bfp = Fluorescence.blueWithInteraction(hek);
+//        ModulePorts cho = sortedCells.get(Sorting.EXTERIOR); // Sorting.EXTERIOR == "EXTERIOR"
+//
+//        Map<String, ModulePorts> firstSwitch = Sorting.sortedRegion(cho, 8675309);
+//        builder.getDocument().write(System.out);
+//        ModulePorts firstSwitchPorts = firstSwitch.get("SWITCH");
+//
+//        Map<String, ModulePorts> secondSwitch = Sorting.sortedRegion(cho, 10281993);
+//        builder.getDocument().write(System.out);
+//        ModulePorts secondSwitchPorts = secondSwitch.get("SWITCH");
+//        
+//        Map<String, ModulePorts> thirdSwitch = Sorting.sortedRegion(cho, 10281993);
+//        builder.getDocument().write(System.out);
+//        ModulePorts thirdSwitchPorts = thirdSwitch.get("SWITCH");
+//        
+//        log.info("firstSwitchPorts : " + firstSwitchPorts.toString());
+//        log.info("secondSwitchPorts : " + secondSwitchPorts.toString());
+//        log.info("thirdSwitchPorts : " + thirdSwitchPorts.toString());
+//
+//
+//
+//        FunctionalComponent firstSwitchOut0 = firstSwitchPorts.getOutput("hEF1a_fc");
+//        FunctionalComponent firstSwitchOut1 = firstSwitchPorts.getOutput("UbC_fc");    
+//
+//        FunctionalComponent secondSwitchOut0 = secondSwitchPorts.getOutput("hEF1a_fc");
+//        FunctionalComponent secondSwitchOut1 = secondSwitchPorts.getOutput("UbC_fc");
+//
+//        FunctionalComponent thirdSwitchOut0 = thirdSwitchPorts.getOutput("hEF1a_fc");
+//        FunctionalComponent thirdSwitchOut1 = thirdSwitchPorts.getOutput("UbC_fc");                
+//
+//        ModulePorts cadherin0 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Ncad_2A_EYFP_expression"));
+//        builder.connect(firstSwitchOut0, cadherin0.getInput());
+//        builder.connect(firstSwitchOut1, secondSwitchPorts.getInput("generic_promoter_fc"));
+//
+//        ModulePorts cadherin1 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh6_expression"));
+//        builder.connect(secondSwitchOut0, cadherin1.getInput());
+//        builder.connect(secondSwitchOut1, thirdSwitchPorts.getInput("generic_promoter_fc"));
+//
+//        ModulePorts cadherin2 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh1_2A_mKate_expression"));
+//        ModulePorts cadherin3 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh3_2A_cerrulean_expression"));
+//        builder.connect(thirdSwitchOut0, cadherin2.getInput());
+//        builder.connect(thirdSwitchOut1, cadherin3.getInput());
+//
+//        //builder.getDocument().write("/Users/bbasnigh/scratch/replace.xml");
+//
+//        assertTrue(CircuitBuilder.instance().validate());
+//    }
+//
+//    @Test
+//    public void testSecondOrderSortingInLoop() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: testSecondOrderSorting");
+//        setup();
+//        
+//        String builderName = "HEKAndNTimeSortedCHO";
+//        CircuitBuilder builder = new CircuitBuilder(builderName);
+//        Map<String, ModulePorts> sortedCells = Sorting.HEKCHOSortedBall(0.0001, 0.8); // hek is interior, cho is exterior
+//        ModulePorts hek = sortedCells.get(Sorting.INTERIOR); // Sorting.INTERIOR == "INTERIOR"
+//        ModulePorts cho = sortedCells.get(Sorting.EXTERIOR); // Sorting.EXTERIOR == "EXTERIOR"
+//
+//
+//
+//
+//
+//        ModulePorts cadherin0 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Ncad_2A_EYFP_expression"));
+//        ModulePorts cadherin1 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh6_expression"));
+//        ModulePorts cadherin2 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh1_2A_mKate_expression"));
+//        ModulePorts cadherin3 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh3_2A_cerrulean_expression"));
+//        FunctionalComponent[] cadherins = {cadherin0.getInput(), cadherin1.getInput(), cadherin2.getInput(), cadherin3.getInput()};
+//
+//
+//        Map<String, ModulePorts> firstSwitch = Sorting.sortedRegion(cho, 8675309);
+//        builder.getDocument().write(System.out);
+//        ModulePorts firstSwitchPorts = firstSwitch.get("SWITCH");
+//
+//        // briefly make first connection with the top half output of first switch to any cadherin
+//        FunctionalComponent previousSwitchOutHEF1 = firstSwitchPorts.getOutput("hEF1a_fc");
+//        builder.connect(previousSwitchOutHEF1, cadherins[0]);
+//
+//
+//        FunctionalComponent previousSwitchOut = firstSwitchPorts.getOutput("UbC_fc");        
+//
+//        for (int i=1; i<cadherins.length; i++) {
+//            Map<String, ModulePorts> nthSort = Sorting.sortedRegion(cho, 10281993, previousSwitchOut, cadherins[i]);
+//            builder.getDocument().write(System.out);
+//            previousSwitchOut = nthSort.get("SWITCH").getOutput("UbC_fc");
+//        }
+//
+//        //builder.getDocument().write("/Users/bbasnigh/scratch/replace.xml");
+//
+//        assertTrue(CircuitBuilder.instance().validate());
+//    }
+
+    @Test
+    public void testModelComposition() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+        log.info("RUNNING TEST: modelComposition");
+        setup();
+
+        CircuitBuilder builder = new CircuitBuilder("model_composition");
+        ModuleDefinition cascade_1 = builder.importModule(new URI(DEFAULT_NAMESPACE+"/R1_R2"));
+        ModuleDefinition cascade_2 = builder.importModule(new URI(DEFAULT_NAMESPACE+"/R3_R4"));
+        ModulePorts cascade_interface_1 = builder.instantiateModule(cascade_1);
+        ModulePorts cascade_interface_2 = builder.instantiateModule(cascade_2);
+        FunctionalComponent attP_output_1 = cascade_interface_1.getOutput("R1_R2_recombination_site1_attP");
+        FunctionalComponent attB_output_1 = cascade_interface_1.getOutput("R1_R2_recombination_site1_attB");
+        FunctionalComponent attP_output_2 = cascade_interface_1.getOutput("R1_R2_recombination_site2_attP");
+        FunctionalComponent attB_output_2 = cascade_interface_1.getOutput("R1_R2_recombination_site2_attB");
+        FunctionalComponent attP_input_1 = cascade_interface_2.getInput("R1_attP");
+        FunctionalComponent attB_input_1 = cascade_interface_2.getInput("R1_attB");
+        FunctionalComponent attP_input_2 = cascade_interface_2.getInput("R2_attP");
+        FunctionalComponent attB_input_2 = cascade_interface_2.getInput("R2_attB");
+        
+        
+//        CircuitBuilder builder = new CircuitBuilder("model_composition");
+//        ModuleDefinition cho = builder.importModule(new URI("https://bbn.com/CHO"));
+//        ModuleDefinition r1 = builder.importModule(new URI("https://bbn.com/r1")); 
+//        ModuleDefinition r2 = builder.importModule(new URI("https://bbn.com/r2")); 
+//
+//        // create a differentiation switch for this Module
+//        String switch_id_1 = builder.instanceUID("switch_1");
+//        ModuleDefinition switch_1 = builder.createDifferentiationSwitch(switch_id_1);
+//        ModulePorts switch_interface_1 = builder.instantiateModule(switch_1.getIdentity());
+//
+//        String switch_id_2 = builder.instanceUID("switch_2");
+//        ModuleDefinition switch_2 = builder.createDifferentiationSwitch(switch_id_2);
+//        ModulePorts switch_interface_2 = builder.instantiateModule(switch_2.getIdentity());
+//
+//        Map<String, ModulePorts> firstSwitch = Sorting.sortedRegion(cho, switch_1, 8675309);
+
+        
+//        ModulePorts cadherin0 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Ncad_2A_EYFP_expression"));
+//        ModulePorts cadherin1 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh6_expression"));
+//        ModulePorts cadherin2 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh1_2A_mKate_expression"));
+//        ModulePorts cadherin3 = builder.instantiateModule(new URI(DEFAULT_NAMESPACE + "/Cdh3_2A_cerrulean_expression"));
+//        FunctionalComponent[] cadherins = {cadherin0.getInput(), cadherin1.getInput(), cadherin2.getInput(), cadherin3.getInput()};
+//
+//
+//        builder.getDocument().write(System.out);
+//        ModulePorts firstSwitchPorts = firstSwitch.get("SWITCH");
+//
+//        // briefly make first connection with the top half output of first switch to any cadherin
+//        FunctionalComponent previousSwitchOutHEF1 = firstSwitchPorts.getOutput("hEF1a_fc");
+//        builder.connect(previousSwitchOutHEF1, cadherins[0]);
+//
+//
+//        FunctionalComponent previousSwitchOut = firstSwitchPorts.getOutput("UbC_fc");        
+//
+//        for (int i=1; i<cadherins.length; i++) {
+//            Map<String, ModulePorts> nthSort = Sorting.sortedRegion(cho, 10281993, previousSwitchOut, cadherins[i]);
+//            builder.getDocument().write(System.out);
+//            previousSwitchOut = nthSort.get("SWITCH").getOutput("UbC_fc");
+//        }
+//
+//        //builder.getDocument().write("/Users/bbasnigh/scratch/replace.xml");
+//
+//        assertTrue(CircuitBuilder.instance().validate());
+    }
+    
+//    @Test
+//    public void testTaggedCDS() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: testTaggedCDS");
+//        setup();
+//        
+//        String builderName = "TaggedCDS";
+//        CircuitBuilder taggedCDSBuilder = new CircuitBuilder(builderName);
+//        ComponentDefinition Cdh1_2A_mKate = taggedCDSBuilder.getComponentDefinition(new URI("https://bbn.com/Cdh1_2A_mKate"));
+//        ComponentDefinition PEST = taggedCDSBuilder.getComponentDefinition(new URI("https://bbn.com/BBa_J176018"));
+//        ModuleDefinition taggedCDSDefinition = taggedCDSBuilder.createDegredationTaggedCDS(Cdh1_2A_mKate.getDisplayId()+"_TAGGED_"+PEST.getDisplayId(), Cdh1_2A_mKate, PEST);
+//        ModulePorts taggedCDSPorts = taggedCDSBuilder.instantiateModule(taggedCDSDefinition);
+//        log.info("taggedCDSPorts : " + taggedCDSPorts.toString());
+//        // taggedCDSBuilder.getDocument().write(System.out);
+//        //taggedCDSBuilder.getDocument().write("/Users/bbasnigh/scratch/replace.xml");
+//        
+//        assertTrue(CircuitBuilder.instance().validate());
+//    }
+//
+//    @Test
+//    public void testSortedRegion() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: testSortedRegion");
+//        setup();
+//        
+//        String builderName = "SortedChoExperiment";
+//        CircuitBuilder secondarySorting = new CircuitBuilder(builderName);
+//        ModulePorts cho = secondarySorting.instantiateModule(new URI(DEFAULT_NAMESPACE + "/CHO"));
+//        Map<String, ModulePorts> sortedCells = Sorting.sortedRegion(cho, 8675309);
+//
+//        secondarySorting.getDocument().write(System.out);
+//
+//        ModulePorts switchPorts = sortedCells.get("SWITCH");
+//        log.info("switchPorts : " + switchPorts.toString());        
+//        assertTrue(CircuitBuilder.instance().validate());
+//    }
+//    
+//    @Test
+//    public void testThreeLayerWithFluorescence() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: testThreeLayerWithFluorescence");
+//        setup();
+//        
+//        String builderName = "secondarySorting";
+//        CircuitBuilder secondarySorting = new CircuitBuilder(builderName);
+//
+//        Map<String, ModulePorts> sortedCells = Sorting.HEKCHOSortedBall(0.0001, 0.8); // hek is interior, cho is exterior
+//        ModulePorts hek = sortedCells.get(Sorting.INTERIOR); // Sorting.INTERIOR == "INTERIOR"
+//        ModulePorts cho = sortedCells.get(Sorting.EXTERIOR); // Sorting.EXTERIOR == "EXTERIOR"
+//        ModulePorts mkate = Fluorescence.redWithInteraction(hek);
+//        ModulePorts bfp = Fluorescence.blueWithInteraction(cho);
+//
+//        Map<String, ModulePorts> secondarySortedCells = Sorting.sortedRegion(cho, 28);
+//
+//        secondarySorting.getDocument().write(System.out);
+//        
+//        assertTrue(CircuitBuilder.instance().validate());
+//    }
+//
+//    /**
+//     * Test that we can successfully grab module definitions from SynBioHub, along with their sub-elements.
+//    **/
+//    @Test
+//    public void speckledBall() throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+//        log.info("RUNNING TEST: speckledBall");
+//        SBOLDocument part_shop = setup();
+//        ModulePorts ports = Sorting.speckledBall("iCHO_HEK", 0.0001, 100, part_shop.getModuleDefinitions());
+//    }
+
+    private SBOLDocument setup() throws SBOLValidationException, IOException, SBOLConversionException {
+        File partShopFile = new File(this.getClass().getClassLoader().getResource(PART_SHOP_PATH).getPath());
+        SBOLDocument part_shop = SBOLReader.read(partShopFile);
+        DefinitionImporter.storeInCache(part_shop);
+        return part_shop;
+    }
+
+}

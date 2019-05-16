@@ -1,0 +1,1173 @@
+package elm_parts;
+
+import org.sbolstandard.core2.*;
+import org.synbiohub.frontend.SynBioHubException;
+//
+//import uk.ac.ncl.intbio.core.io.*;
+//import uk.ac.ncl.intbio.core.io.CoreIoException;
+import org.synbiohub.frontend.SynBioHubFrontend;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
+import java.util.Scanner;
+//import org.biojava.nbio.core.sequence.io.*;
+//import org.biojava.nbio.core.sequence.loader.GenbankProxySequenceReader;
+//import org.biojava.nbio.core.sequence.DNASequence;
+//import org.biojava.nbio.core.sequence.compound.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.xml.namespace.QName;
+
+import java.util.Hashtable;
+
+
+public class ELMPartShop  {
+	
+	static String project_dir = "/Users/bbartley/Dev/git/elm_parts/elm_parts/genbank";
+	static SequenceOntology SO = new SequenceOntology();
+	private static SBOLDocument elm_part_shop = new SBOLDocument();
+
+	static String defaultNamespace = "https://bbn.com";
+   
+    // Custom URIs for ModuleDefinitions 
+    private static final String EXPRESSION_MODULE = defaultNamespace + "/expression";
+    private static final String CONSTITUTIVE_MODULE = defaultNamespace + "/constitutive";
+    private static final String REGULATION_MODULE = defaultNamespace + "/regulation";
+    private static final String RECOMBINATION_MODULE = defaultNamespace + "/recombination";
+    private static final String DIFFERENTIATION_MODULE = defaultNamespace + "/differentiation";
+    private static final String DIFFERENTIATION_CASCADE = defaultNamespace + "/differentiation_cascade";
+    private static final String HOST_MODULE = defaultNamespace + "/host";
+    private static final String MEDIUM_MODULE = "http://purl.obolibrary.org/obo/OBI_0000079";
+
+    public static final QName STRUCTURE_PROPERTY = new QName("http://bbn.com/FACETS/","structure","facets");
+    public static final QName CELL_DIAMETER = new QName("http://bbn.com/FACETS/","diameter","facets");
+    public static final QName PERCOLATION_FACTOR = new QName("http://bbn.com/FACETS/","interactionDistance","facets");
+    public static final QName CONTACT_ENERGY = new QName("http://bbn.com/FACETS/","contactEnergy","facets");
+    public static final QName EXPRESSION_LEVEL = new QName("http://bbn.com/FACETS/","expressionLevel","facets");
+    public static final QName RECOMBINATION_EFFICIENCY = new QName("http://bbn.com/FACETS/","recombinationEfficiency","facets");
+    public static final QName SITE_INDEX = new QName("http://bbn.com/FACETS/","siteIndex","facets");
+	
+	
+	
+	public static void main(String[] args) throws SBOLValidationException, IOException, SBOLConversionException, Exception  {
+		elm_part_shop.setDefaultURIprefix(defaultNamespace);
+
+		ArrayList<String> sbol_file_names = new ArrayList<String>(0);  // Contains SBOL file names of converted Genbank files
+		SBOLDocument master = new SBOLDocument();  // All converted SBOL will be integrated into this file
+		master.setDefaultURIprefix(defaultNamespace);
+
+
+//		// Convert all project GenBank files to SBOL2
+//		sbol_file_names = convertDirectory(project_dir);
+
+//		// Integrate files
+//		integrateSBOLFiles(project_dir, master);
+		
+//		// Print unique SO and Geneious annotations
+		master = SBOLReader.read(project_dir + "/master.xml");
+//		printUniqueAnnotations(master);
+		
+//		// Calculate frequency of occurrence of CDS and promoter features
+//		master = SBOLReader.read(project_dir + "/master.xml");
+//		printAnnotationFrequencies(extractPromotersAndGenes(master));
+
+//		// Writes only promoters and CDS ComponentDefinitions to PartShop file 
+//		writePartShopAsSBOL(project_dir + "/elm_part_shop.xml", master);
+		
+//		// Convert individual parts to GenBank, ie, create a Genbank version of the 'ELM Parts Shop'
+//		elm_part_shop = SBOLReader.read(project_dir + "/elm_part_shop.xml");
+//		SBOLValidate.validate(System.out,System.err, project_dir + "/elm_part_shop.xml", ELMPartShop.defaultNamespace, true, true, true, false, "1", false, "", "", "", "", true, false, false, project_dir + "/elm_part_shop.gb", false, false, true);
+//
+//		scrapeEntryVectors(project_dir, elm_part_shop);
+//		SBOLWriter.write(elm_part_shop, project_dir + "/elm_part_shop.xml");
+//
+		
+		// Create ModuleDefinitions from ComponentDefinitions in PartShop
+		elm_part_shop = SBOLReader.read(project_dir + "/elm_part_shop.xml");
+		elm_part_shop.setDefaultURIprefix(defaultNamespace);
+
+		ComponentDefinition generic_promoter = elm_part_shop.createComponentDefinition("generic_promoter", ComponentDefinition.DNA);
+		generic_promoter.addRole(SO.PROMOTER);
+				
+		System.out.println("Creating Expression Modules");
+
+		// Construct Expression Modules
+		String[] expression = { "Bla", "Cdh1", "Cdh1_2A_mKate", "Cdh2", "Cdh3", "Cdh3_2A_cerrulean", "Cdh6", "Constitutively_Active_RAC1", "Dominant_Negative_RAC1", "Hygro", "McbR_NES_ABI", "mKate", "Ncad_2A_EYFP", "NLS_ECFP", "NLS_EGFP", "NLS_EYFP", "NLS_mKate", "NLS_tagBFP", "p27kip1", "PhiC31", "PhiC31_2A_mKate", "rtTA3", "rtTA3_2A_Hygro", "tagBFP", "VP16_PYL1", "WBeta", "WBeta_2A_Cerulean" };
+		for (String displayId : expression) {
+			System.out.println("Creating " + displayId);
+			ComponentDefinition cds = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/" + displayId));
+			assemblePrimaryStructure(createExpressionModule(displayId + "_expression", generic_promoter, cds));
+			
+		}
+	
+		System.out.println("Creating Promoter Modules");
+
+		// Constitutive promoters
+		ComponentDefinition hef1a_promoter = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/hEF1a"));
+		ComponentDefinition ubc_promoter = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/UbC"));
+
+		// Construct constitutive promoter modules
+		assemblePrimaryStructure(createConsitutivePromoterModule("phEF1a_module", hef1a_promoter ));
+		assemblePrimaryStructure(createConsitutivePromoterModule("pUbC_module", ubc_promoter ));
+		
+		// Inducible promoters
+		ComponentDefinition mcbr_promoter = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/McbR_activatable_promoter"));
+		ComponentDefinition phlfr_promoter = elm_part_shop.createComponentDefinition("pPhlFr", ComponentDefinition.DNA);  // The actual promoter component gets overwritten in scrapeEntryVectors because of a name collision with the CDS
+		phlfr_promoter.addRole(SequenceOntology.PROMOTER);
+		ComponentDefinition tre_promoter = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/TRE_tight"));
+	
+		System.out.println("Creating Regulation Modules");
+
+		// Transcription factors
+		ComponentDefinition rtta3_tf = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/rtTA3"));
+		ComponentDefinition rtta3_2a_hygro_tf = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/rtTA3_2A_Hygro"));
+		ComponentDefinition mcbr_nes_abi_tf = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/McbR_NES_ABI"));
+		ComponentDefinition phlfr_tf = elm_part_shop.getComponentDefinition(new URI(defaultNamespace + "/PhlFr"));
+		
+		// Construct Regulation modules
+		assemblePrimaryStructure(createRegulationModule("rtTA3_module", generic_promoter, rtta3_tf, tre_promoter));
+		assemblePrimaryStructure(createRegulationModule("rtTA3_2A_Hygro_module", generic_promoter, rtta3_2a_hygro_tf, tre_promoter ));
+		assemblePrimaryStructure(createRegulationModule("McbR_NES_ABI_module",generic_promoter, mcbr_nes_abi_tf, mcbr_promoter ));
+		assemblePrimaryStructure(createRegulationModule("PhlFr_module", generic_promoter, phlfr_tf, phlfr_promoter ));
+
+		
+//		// Create Recombination Sites
+//		elm_part_shop = SBOLReader.read(project_dir + "/elm_part_shop.xml");
+//		elm_part_shop.setDefaultURIprefix(defaultNamespace);
+
+		Sequence PhiC31_attP_seq = elm_part_shop.createSequence("PhiC31_attP_seq", "GGAGTAGTGCCCCAACTGGGGTAACCTTTGAGTTCTCTCAGTTGGGGGCGTAGGGTC", Sequence.IUPAC_DNA);
+		Sequence PhiC31_attB_seq = elm_part_shop.createSequence("PhiC31_attB_seq", "TGCGGGTGCCAGGGCGTGCCCTTGGGCTCCCCGGGCGCGTACTCC", Sequence.IUPAC_DNA);
+		Sequence WBeta_attP_seq = elm_part_shop.createSequence("WBeta_attP_seq", "TAGTTTTAAAGTTGGTTATTAGTTACTGTGATATTTATCACGGTACCCAATAACCAATGAA", Sequence.IUPAC_DNA);
+		Sequence WBeta_attB_seq = elm_part_shop.createSequence("WBeta_attB_seq", "AAGGTAGCGTCAACGATAGGTGTAACTGTCGTGTTTGTAACGGTACTTCCAACAGCTGGCG", Sequence.IUPAC_DNA);
+		
+		ComponentDefinition PhiC31_attP = elm_part_shop.createComponentDefinition("PhiC31_attP", ComponentDefinition.DNA);
+		ComponentDefinition PhiC31_attB = elm_part_shop.createComponentDefinition("PhiC31_attB", ComponentDefinition.DNA);
+		ComponentDefinition WBeta_attP = elm_part_shop.createComponentDefinition("WBeta_attP", ComponentDefinition.DNA);
+		ComponentDefinition WBeta_attB = elm_part_shop.createComponentDefinition("WBeta_attB", ComponentDefinition.DNA);
+		PhiC31_attP.addSequence(PhiC31_attP_seq);
+		PhiC31_attB.addSequence(PhiC31_attB_seq);
+		WBeta_attP.addSequence(WBeta_attP_seq);
+		WBeta_attB.addSequence(WBeta_attB_seq);
+		PhiC31_attP.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000942"));
+		PhiC31_attB.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000943"));
+		WBeta_attP.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000942"));
+		WBeta_attB.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000943"));		
+
+		// Generic parts
+		ComponentDefinition attP_site1 = elm_part_shop.createComponentDefinition("attP_site1", ComponentDefinition.DNA);
+		ComponentDefinition attB_site1 = elm_part_shop.createComponentDefinition("attB_site1", ComponentDefinition.DNA);
+		ComponentDefinition attP_site2 = elm_part_shop.createComponentDefinition("attP_site2", ComponentDefinition.DNA);
+		ComponentDefinition attB_site2 = elm_part_shop.createComponentDefinition("attB_site2", ComponentDefinition.DNA);
+		attP_site1.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000942"));
+		attB_site1.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000943"));
+		attP_site2.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000942"));
+		attB_site2.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000943"));		
+
+		// Generic terminators
+		Sequence t1_seq = elm_part_shop.createSequence("t1_seq",  "nnn", Sequence.IUPAC_DNA);
+		Sequence t2_seq = elm_part_shop.createSequence("t2_seq",  "nnn", Sequence.IUPAC_DNA);
+		ComponentDefinition t1 = elm_part_shop.createComponentDefinition("t1", ComponentDefinition.DNA);
+		ComponentDefinition t2 = elm_part_shop.createComponentDefinition("t2", ComponentDefinition.DNA);
+		t1.addRole(SequenceOntology.TERMINATOR);
+		t2.addRole(SequenceOntology.TERMINATOR);
+		t1.addSequence(t1_seq);
+		t2.addSequence(t2_seq);
+		
+		// Create differentiation switch
+		ComponentDefinition hEF1a = elm_part_shop.getComponentDefinition("hEF1a", "");
+		ComponentDefinition PhiC31 = elm_part_shop.getComponentDefinition("PhiC31", "");
+		ComponentDefinition WBeta = elm_part_shop.getComponentDefinition("WBeta", "");
+		ComponentDefinition mKate = elm_part_shop.getComponentDefinition("mKate", "");
+		ComponentDefinition tagBFP = elm_part_shop.getComponentDefinition("tagBFP", "");
+
+		ModuleDefinition r1 = ELMPartShop.createRecombinationModule("r1", PhiC31, PhiC31_attP, PhiC31_attB);
+		ModuleDefinition r2 = ELMPartShop.createRecombinationModule("r2", WBeta, WBeta_attP, WBeta_attB);
+		ModuleDefinition differentiation_switch = ELMPartShop.createDifferentiationSwitch("switch", hEF1a, t1, mKate, t2, tagBFP);
+
+		System.out.println("Created Recombination Modules");
+		// Create differentiation cascade for IWBDA 2019 abstract
+		r1 = ELMPartShop.createGenericRecombinationModule("R1");
+		r2 = ELMPartShop.createGenericRecombinationModule("R2");
+		ModuleDefinition r3 = ELMPartShop.createGenericRecombinationModule("R3");
+		ModuleDefinition r4 = ELMPartShop.createGenericRecombinationModule("R4");
+		System.out.println("Creating R1_R2");
+
+		ELMPartShop.createDifferentiationCascade("R1_R2", r1, r2, 1, 0.6, 0.4);
+		ELMPartShop.createDifferentiationCascade("R3_R4", r3, r4, 12., 0.6, 0.4);
+
+		
+		SBOLValidate.validateSBOL(elm_part_shop, true, true, true); 
+    	if (SBOLValidate.getNumErrors() > 0) {
+    		for (String error : SBOLValidate.getErrors()) { 
+    			System.out.println(error);
+    		}
+    	}
+		SBOLWriter.write(elm_part_shop, project_dir + "/test_modules.xml");	
+
+		
+		// Create Cells
+		ModuleDefinition cho = ELMPartShop.createHostModule("CHO");
+		ModuleDefinition hek = ELMPartShop.createHostModule("HEK");
+		ModuleDefinition medium = ELMPartShop.createMediumModule("Medium");
+		FunctionalComponent fc1_cho = cho.createFunctionalComponent("CHO_fc", AccessType.PUBLIC, cho.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+		FunctionalComponent fc2_cho = cho.createFunctionalComponent("HEK_fc", AccessType.PUBLIC, hek.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+		FunctionalComponent fc3_cho = cho.createFunctionalComponent("medium_fc", AccessType.PUBLIC, medium.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+		Interaction i1_cho = cho.createInteraction("cho_hek", new URI("http://purl.obolibrary.org/obo/GO_0098609"));  // cell-to-cell adhesion
+		Interaction i2_cho = cho.createInteraction("cho_cho", new URI("http://purl.obolibrary.org/obo/GO_0098609") );
+		Interaction i3_cho = cho.createInteraction("cho_medium", new URI("http://purl.obolibrary.org/obo/GO_0098609"));
+		i1_cho.createAnnotation(CONTACT_ENERGY, "35");
+		i2_cho.createAnnotation(CONTACT_ENERGY, "35");
+		i3_cho.createAnnotation(CONTACT_ENERGY, "10");
+		
+		// Participations for i1
+		Participation p1_cho = i1_cho.createParticipation("HEK_p", fc2_cho.getIdentity(), new URI("http://purl.obolibrary.org/obo/GO_0005623"));  // Gene ontology: cell
+
+		// Participations for i2
+		p1_cho = i2_cho.createParticipation("CHO_p", fc1_cho.getIdentity(), new URI("http://purl.obolibrary.org/obo/GO_0005623"));  // Gene ontology: cell
+
+		// Participations for i3
+		p1_cho = i3_cho.createParticipation("medium_p", fc3_cho.getIdentity(), new URI("http://purl.obolibrary.org/obo/GO_0005623"));  // Gene ontology: cell
+
+		FunctionalComponent fc1_hek = hek.createFunctionalComponent("HEK_fc", AccessType.PUBLIC, hek.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+		FunctionalComponent fc2_hek = hek.createFunctionalComponent("CHO_fc", AccessType.PUBLIC, cho.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+		FunctionalComponent fc3_hek = hek.createFunctionalComponent("medium_fc", AccessType.PUBLIC, medium.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+		Interaction i1_hek = hek.createInteraction("hek_cho", new URI("http://purl.obolibrary.org/obo/GO_0098609"));  // cell-to-cell adhesion
+		Interaction i2_hek = hek.createInteraction("hek_hek", new URI("http://purl.obolibrary.org/obo/GO_0098609") );
+		Interaction i3_hek = hek.createInteraction("hek_medium", new URI("http://purl.obolibrary.org/obo/GO_0098609"));
+		i1_hek.createAnnotation(CONTACT_ENERGY, "35");
+		i2_hek.createAnnotation(CONTACT_ENERGY, "10");
+		i3_hek.createAnnotation(CONTACT_ENERGY, "10");
+		
+		// Participations for i1
+		Participation p1_hek = i1_hek.createParticipation("CHO_p", fc2_hek.getIdentity(), new URI("http://purl.obolibrary.org/obo/GO_0005623"));  // Gene ontology: cell
+
+		// Participations for i2
+		p1_hek = i2_hek.createParticipation("HEK_p", fc1_hek.getIdentity(), new URI("http://purl.obolibrary.org/obo/GO_0005623"));  // Gene ontology: cell
+
+		// Participations for i3
+		p1_hek = i3_hek.createParticipation("medium_p", fc3_hek.getIdentity(), new URI("http://purl.obolibrary.org/obo/GO_0005623"));  // Gene ontology: cell
+
+		// Construct representation for medium
+		FunctionalComponent fc1_medium = medium.createFunctionalComponent("med_fc", AccessType.PUBLIC, medium.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+		Interaction i1_medium = medium.createInteraction("med_med",  new URI("http://purl.obolibrary.org/obo/GO_0098609"));
+		i1_medium.createAnnotation(CONTACT_ENERGY, "10");
+		Participation p1_med = i1_medium.createParticipation("med_p", fc1_medium.getIdentity(), new URI(MEDIUM_MODULE));  // OBI: culture medium
+		
+		
+		SBOLValidate.validateSBOL(elm_part_shop, true, true, true); 
+
+		SBOLWriter.write(elm_part_shop, project_dir + "/test_modules.xml");	
+
+		//		// Submit to synbiohub
+//		pushToPartShop(project_dir, "elm_part_shop.xml");
+
+		System.out.println("Complete");
+
+	}
+	
+	
+
+	// Gather all files in a directory with the given extension
+	public static ArrayList<String> getFilesByExtension(String project_dir, String file_ext) {
+		ArrayList<String> file_list = new ArrayList<String>(0);
+		File[] files = new File(project_dir).listFiles();
+	    for (File file : files) {
+	        if (!file.isDirectory()) {
+	        		String f_path = file.getPath();
+	        		String f_prefix = "";
+	        		String f_ext = "";
+	        		int i_delimiter = f_path.lastIndexOf('.');
+	        		if (i_delimiter > 0) {
+		        		f_prefix = f_path.substring(0, i_delimiter);
+		        		f_ext = f_path.substring(i_delimiter + 1);
+	        		}
+	            	if (f_ext.equals(file_ext)) {
+	            		file_list.add(file_list.size(), f_path);
+	            }
+	        }
+	    }
+	    return file_list;
+	}
+	
+	// Convert GenBank to SBOL
+	public static String convertFile(String f_path) throws SBOLValidationException, IOException, SBOLConversionException {
+		String sbol_out = "";
+		String f_prefix = "";
+		String f_ext = "";
+		int i_delimiter = f_path.lastIndexOf('.');
+		if (i_delimiter > 0) {
+			f_prefix = f_path.substring(0, i_delimiter);
+			f_ext = f_path.substring(i_delimiter + 1);
+		}
+		if (f_ext.equals("gb")) {
+			System.out.println("Converting " + f_prefix);
+			sbol_out = f_prefix + ".xml";
+			org.sbolstandard.core2.SBOLValidate.validate(System.out,System.err, f_path, ELMPartShop.defaultNamespace, true, true, true, false, "1", false, "", "", "", "", false, false, false, sbol_out, false, false, true);
+		}
+		return sbol_out;
+	}
+
+	// Convert all files in a directory from Genbank to SBOL
+	public static ArrayList<String> convertDirectory(String project_dir) throws SBOLValidationException, IOException, SBOLConversionException {
+		ArrayList<String> sbol_files = new ArrayList<String>(0);
+		ArrayList<String> gb_files = ELMPartShop.getFilesByExtension(project_dir, "gb");
+		for (String f_path : gb_files) {
+			String sbol_out = ELMPartShop.convertFile(f_path);
+	        sbol_files.add(sbol_files.size(), sbol_out);
+		}
+		System.out.println("Conversion complete");
+		System.out.println();
+	    return sbol_files;
+	}
+	
+	// Integrate all SBOL files in the given directory into the given master Document
+	public static void integrateSBOLFiles(String project_dir, SBOLDocument master) throws SBOLValidationException, IOException, SBOLConversionException {
+		ArrayList<String> sbol_file_names = getFilesByExtension(project_dir, "xml");
+		for (String f_name : sbol_file_names) {
+			System.out.println("Integrating: " + f_name);
+			SBOLDocument doc = SBOLReader.read(f_name);
+			master.createCopy(doc);
+		}
+		SBOLWriter.write(master, project_dir + "/master.xml");
+		System.out.println("Integration complete");
+		System.out.println();		
+	}
+	
+	public static void printUniqueAnnotations(SBOLDocument doc) {
+		SequenceOntology SO = new SequenceOntology();
+		Set<String> feature_names = new TreeSet<String>();
+		Set<String> feature_roles = new TreeSet<String>();
+		for (ComponentDefinition cd : doc.getComponentDefinitions()) {
+			for (SequenceAnnotation ann : cd.getSequenceAnnotations()) {
+				feature_names.add(ann.getName());
+				for (URI role : ann.getRoles()) {
+					feature_roles.add(SO.getName(role));
+				}	
+			}
+		}
+		System.out.println("SO features:\n-----------");
+		for (String role : feature_roles) {
+			System.out.println(role);
+		}
+		System.out.println();
+		System.out.println("Geneious features:\n------------");
+		for (String name : feature_names) {
+			System.out.println(name);
+		}
+	}
+	
+	// Get vector name by accessing the generic "locus" annotation
+	public static String getVectorName(ComponentDefinition cd) {
+		Annotation locus = cd.getAnnotation(new QName("http://www.ncbi.nlm.nih.gov/genbank#", "locus", "genbank"));
+		String vector_name = "";
+		if (locus != null) {
+			System.out.println(locus.toString());
+			vector_name = locus.getStringValue();
+		}
+		return vector_name;
+	}
+	
+	public static Hashtable<String, ArrayList<SequenceAnnotation>> extractPromotersAndGenes(SBOLDocument doc) throws SBOLValidationException {
+		// Identity all unique occurrences of particular unique nucleotide sequences corresponding to promoters or CDS
+		Hashtable<String, ArrayList<SequenceAnnotation>> sequence_map = new Hashtable<String, ArrayList<SequenceAnnotation>>();
+		SequenceOntology SO = new SequenceOntology();
+
+		for (ComponentDefinition cd : doc.getComponentDefinitions()) {
+			Sequence vector_sequence = cd.getSequences().iterator().next();
+			for (SequenceAnnotation ann : cd.getSequenceAnnotations()) {
+				
+				// First check if feature is a promoter or CDS by checking natural language description
+				String feature_info = ann.getName();
+				if (feature_info.toLowerCase().contains("promoter")) {
+					// Many promoters do not have correct SO type, eg "misc_feature"
+					ann.clearRoles();
+					ann.addRole(SO.PROMOTER);
+				}
+				if (feature_info.toLowerCase().contains("CDS") || feature_info.toLowerCase().contains("ORF")) {
+					// Some coding sequences are described as "ORF"
+					ann.clearRoles();
+					ann.addRole(SO.CDS);
+				}
+				
+				// Check features by SO type
+				URI feature_type = ann.getRoles().iterator().next();
+				String feature = SO.getName(feature_type);
+				if (feature_type.equals(SO.CDS) || feature_type.equals(SO.PROMOTER)) {
+					String feature_sequence_elements = extractSequenceElements(vector_sequence, ann);
+
+					// If this nucleotide sequence isn't recognized then catalog the new promoter / CDS
+					if (!sequence_map.containsKey(feature_sequence_elements))
+						sequence_map.put(feature_sequence_elements, new ArrayList<SequenceAnnotation>(0));
+					sequence_map.get(feature_sequence_elements).add(ann);
+					
+					// The parent CD has important description about the parent vector that we need to hold on to
+					ann.setDescription(cd.getDescription());
+				}
+				// set wasDerivedFrom to cd.identity
+			}
+		}
+		return sequence_map;	
+	}
+
+//	public static Hashtable<String, ArrayList<SequenceAnnotation>> extractRecombinationSites(SBOLDocument doc) throws SBOLValidationException, URISyntaxException {
+//		// Identity all unique occurrences of particular unique nucleotide sequences corresponding to promoters or CDS
+//		Hashtable<String, ArrayList<SequenceAnnotation>> sequence_map = new Hashtable<String, ArrayList<SequenceAnnotation>>();
+//		SequenceOntology SO = new SequenceOntology();
+//		URI recombination_site = SO.getURIbyName("site_specific_recombination_target_region");
+//		System.out.println(recombination_site);
+//
+//		for (ComponentDefinition cd : doc.getComponentDefinitions()) {
+//			Sequence vector_sequence = cd.getSequences().iterator().next();
+//			for (SequenceAnnotation ann : cd.getSequenceAnnotations()) {
+//				
+//				String feature_info = ann.getName();
+//				if (feature_info.contains("attL1")) {
+//					ann.clearRoles();
+//					ann.addRole(recombination_site);
+//				}
+//				if (feature_info.contains("attL2")) {
+//					ann.clearRoles();
+//					ann.addRole(recombination_site);
+//				}
+//				if (feature_info.contains("attL4")) {
+//					ann.clearRoles();
+//					ann.addRole(recombination_site);
+//				}
+//				if (feature_info.contains("attR1")) {
+//					ann.clearRoles();
+//					ann.addRole(recombination_site);
+//				}
+//				if (feature_info.contains("attB1")) {
+//					ann.clearRoles();
+//					ann.addRole(recombination_site);
+//				}
+//				if (feature_info.contains("attB2")) {
+//					ann.clearRoles();
+//					ann.addRole(recombination_site);
+//				}
+//				
+//				// Check features by SO type
+//				URI feature_type = ann.getRoles().iterator().next();
+//				String feature = SO.getName(feature_type);
+//				if (feature_type == recombination_site) {
+//					String feature_sequence_elements = extractSequenceElements(vector_sequence, ann);
+//
+//					// If this nucleotide sequence isn't recognized then catalog the new promoter / CDS
+//					if (!sequence_map.containsKey(feature_sequence_elements))
+//						sequence_map.put(feature_sequence_elements, new ArrayList<SequenceAnnotation>(0));
+//					sequence_map.get(feature_sequence_elements).add(ann);
+//				}
+//			}
+//		}
+//		return sequence_map;	
+//	}
+
+	public static ComponentDefinition extractComponent(SBOLDocument doc, String part_name, String sequence_elements) throws SBOLValidationException {
+		System.out.println("Extracting " + part_name);
+		Sequence part_seq = doc.createSequence(part_name + "_seq", sequence_elements, Sequence.IUPAC_DNA);
+		ComponentDefinition part = doc.createComponentDefinition(part_name, ComponentDefinition.DNA);
+		part.setName(part_name);
+		part.addSequence(part_seq);	
+		return part;
+	}
+
+	public static Set<ComponentDefinition> extractComponents(SBOLDocument doc, Hashtable<String, Set<String>> sequence_map) throws SBOLValidationException {
+		Set<ComponentDefinition> new_parts = new HashSet<ComponentDefinition>(0);
+		for (String feature_name : sequence_map.keySet()) {
+			Set<String> sequences = sequence_map.get(feature_name);
+			Integer i_seq = 0;
+			for (String sequence_elements : sequences) {
+				if (sequences.size() == 0) {
+					ComponentDefinition part = extractComponent(doc, feature_name, sequence_elements);
+					new_parts.add(part);
+				}
+				else {
+					ComponentDefinition part = extractComponent(doc, feature_name + "_" + i_seq.toString(), sequence_elements);
+					new_parts.add(part);
+				}
+				i_seq++;
+			}
+		}
+		return new_parts;
+	}
+	
+	// Searches SequenceAnnotations for a feature name (matching substring, partial matches) and returns the associated nucleotide sequence
+	// If the feature name occurs more than once and is associated with non-unique sequences, then all sequences are returned in the Set
+	public static Hashtable<String, Set<String>> findFeature(SBOLDocument doc, String feature_name) throws SBOLValidationException, URISyntaxException {
+		// Identity all features with the given names and catalog all unique nucleotide sequences corresponding to these features
+		Hashtable<String, Set<String>> sequence_map = new Hashtable<String, Set<String>>();
+		for (ComponentDefinition cd : doc.getComponentDefinitions()) {
+			Sequence vector_sequence = cd.getSequences().iterator().next();
+			for (SequenceAnnotation ann : cd.getSequenceAnnotations()) {
+				if (ann.getName().contains(feature_name)) {
+					String feature_sequence_elements = extractSequenceElements(vector_sequence, ann);
+					if (!sequence_map.containsKey(feature_name))
+						sequence_map.put(feature_name, new HashSet<String>());
+					sequence_map.get(feature_name).add(feature_sequence_elements);
+				}
+			}
+		}
+		return sequence_map;	
+	}
+	
+
+	
+	// Print out statistics on part frequencies in vector maps
+	public static void printAnnotationFrequencies(Hashtable<String, ArrayList<SequenceAnnotation>> sequence_map) {
+		System.out.println("Found " + sequence_map.keySet().size() + " unique part sequences");
+		for(String key: sequence_map.keySet()) {
+			ArrayList<SequenceAnnotation> biopart_instances = sequence_map.get(key);
+			System.out.println(biopart_instances.size() + "\t" + biopart_instances.get(0).getName() + "\t" + key.length());
+		}		
+	}
+	
+	// Extract a sub-sequence based on start and end coordinates of a sequence feature
+	public static String extractSequenceElements(Sequence seq, SequenceAnnotation ann) {
+		String extracted_seq_elements = "";
+		for (Location l : ann.getLocations()) {
+			Range r = (Range)l;
+			int start = r.getStart() - 1;
+			int end = r.getEnd() - 1;
+			extracted_seq_elements = seq.getElements().substring(start, end);
+			// Reverse sequence if reverse complement
+			if (r.getOrientation() == OrientationType.REVERSECOMPLEMENT) {
+		        String reverse_complement = "";
+				for(int i = extracted_seq_elements.length() - 1; i >= 0; --i) {
+					reverse_complement = reverse_complement + extracted_seq_elements.charAt(i);
+		        }
+				extracted_seq_elements = reverse_complement;
+			}
+			// Need to take complement
+		}
+		return extracted_seq_elements;
+	}
+	
+	// Split Genbank files (when more than one sequence is included in the same file and separated by the "//" delimiter)
+	public static void splitGenbank(String project_dir) throws IOException {
+		ArrayList<String> genbank_files = getFilesByExtension(project_dir, "gb");
+	    for (String fname : genbank_files) {
+	    		System.out.println("Parsing " + fname);
+	    		File file = new File(fname);
+			Scanner read = new Scanner (file);
+			read.useDelimiter("//\n");
+			while (read.hasNext())
+			{
+				  String gb = read.next();
+				  gb = gb.trim();
+				  if (gb.length() > 0) {
+					  String locus = gb.substring(12, 35).trim();
+					  int i = gb.indexOf("DEFINITION");
+					  int j = gb.indexOf(".\n", i);
+					  String vector_name = gb.substring(i + 12, j).trim();
+					  System.out.println(locus + "\t" + vector_name);
+					  FileOutputStream fos = new FileOutputStream(new File(project_dir + "/vectors/" + vector_name + ".gb"));
+					  file.createNewFile();
+					  byte[] bytesArray = gb.getBytes();
+					  fos.write(bytesArray);
+					  fos.flush();
+				  }
+			}
+			read.close();
+	    }
+	}
+	
+	public static void scrapeEntryVectors(String project_dir, SBOLDocument doc) throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+		SBOLDocument pENTR = SBOLReader.read(project_dir + "/pENTR.xml");
+		SequenceOntology SO = new SequenceOntology();
+
+		// Scrape recombination sites
+		Hashtable<String, Set<String>> feature_table = new Hashtable<String, Set<String>>();
+		feature_table.putAll(findFeature(pENTR, "attL1"));
+		feature_table.putAll(findFeature(pENTR, "attL2"));
+		feature_table.putAll(findFeature(pENTR, "attL4"));
+		feature_table.putAll(findFeature(pENTR, "attR1"));
+		feature_table.putAll(findFeature(pENTR, "attR2"));
+		feature_table.putAll(findFeature(pENTR, "attR4"));
+		feature_table.putAll(findFeature(pENTR, "attB1"));
+		feature_table.putAll(findFeature(pENTR, "attB2"));
+		feature_table.putAll(findFeature(pENTR, "attB4"));
+		Set<ComponentDefinition> new_parts = extractComponents(elm_part_shop, feature_table);
+		URI recombination_site = SO.getURIbyName("site_specific_recombination_target_region");
+		for (ComponentDefinition cd : new_parts){
+			cd.addRole(recombination_site);
+			Sequence s = cd.getSequences().iterator().next();
+			System.out.println(cd.getDisplayId() + "\t" + s.getElements().length());
+		}
+		
+		// Scrape regions of Entry vectors between recombination sites
+		for (ComponentDefinition cd : pENTR.getComponentDefinitions()) {
+			// Parse the vector description to identify the component of interest
+			String vector_description = cd.getDescription();
+			String component_id = "";
+			URI component_type = new URI("");
+			if (vector_description.contains("L1_")) {
+				int id_start = vector_description.indexOf("L1_") + 3;
+				int id_end = vector_description.indexOf("_L2");
+				component_id = vector_description.substring(id_start, id_end);
+				component_type = SO.CDS;
+			}
+			else if (vector_description.contains("L4_")) {
+				int id_start = vector_description.indexOf("L4_") + 3;
+				int id_end = vector_description.indexOf("_R1");
+				component_id = vector_description.substring(id_start, id_end);
+				component_type = SO.PROMOTER;
+			}
+			System.out.println(component_id + " (" + SO.getName(component_type) + ")");
+			component_id = component_id.replace("-",  "_");
+			
+			// Identify the start and end coordinates of the region between the attL1 & attL2 sites
+			int attL1_end = -1;
+			int attL2_start = -1;
+			int attL4_end = -1;
+			int attR1_start = -1;
+			for (SequenceAnnotation ann : cd.getSequenceAnnotations()) {
+				if (ann.getName().contains("attL1")) {
+					for (Location l : ann.getLocations()) {
+						Range r = (Range)l;
+						attL1_end = r.getEnd() - 1;
+					}
+				}
+				else if (ann.getName().contains("attL2")) {
+					for (Location l : ann.getLocations()) {
+						Range r = (Range)l;
+						attL2_start = r.getStart() - 1;
+					}
+				}
+				else if (ann.getName().contains("attL4")) {
+					for (Location l : ann.getLocations()) {
+						Range r = (Range)l;
+						attL4_end = r.getEnd() - 1;
+					}
+				}
+				else if (ann.getName().contains("attR1")) {
+					for (Location l : ann.getLocations()) {
+						Range r = (Range)l;
+						attR1_start = r.getStart() - 1;
+					}
+				}
+			}
+			
+			// Get sequence elements for the region of interest
+			String roi_seq = "";
+			String seq = cd.getSequences().iterator().next().getElements();
+			if (attL1_end > -1 && attL2_start > -1) {
+				if (attL1_end < attL2_start)
+					roi_seq = seq.substring(attL1_end, attL2_start);
+				else
+					roi_seq = seq.substring(attL1_end, seq.length() - 1) + seq.substring(0, attL2_start);
+			}
+			else if (attL4_end > -1 && attR1_start > -1) {
+				if (attL1_end < attL2_start)
+					roi_seq = seq.substring(attL4_end, attR1_start);
+				else
+					roi_seq = seq.substring(attL4_end, seq.length() - 1) + seq.substring(0, attR1_start);
+			}
+
+//			System.out.format(component_id + "\t%d\t%d\t%d\t%d\n", attL1_end, attL2_start, attL4_end, attR1_start);
+
+			try {
+				Sequence part_seq = doc.createSequence(component_id + "_seq", roi_seq, Sequence.IUPAC_DNA);
+				ComponentDefinition part = doc.createComponentDefinition(component_id, ComponentDefinition.DNA);
+				part.addWasDerivedFrom(cd.getIdentity());
+				part.setName(component_id);
+				part.addRole(component_type);
+				part.addSequence(part_seq);
+			}
+			catch(SBOLValidationException e) {
+				System.out.println("Ignoring duplicate component " + component_id);
+			}
+			
+		}
+	}
+	
+	
+	public static void writePartShopAsSBOL(String file_name, SBOLDocument doc) throws SBOLValidationException, IOException, SBOLConversionException
+	{
+	 	Hashtable<String, ArrayList<SequenceAnnotation>> sequence_map = extractPromotersAndGenes(doc);
+		SequenceOntology SO = new SequenceOntology();
+
+		// Extract new ComponentDefinitions from SequenceAnnotations
+		doc.setDefaultURIprefix(ELMPartShop.defaultNamespace); 
+		doc.setComplete(true);
+		Set<String> nucleotide_sequences = sequence_map.keySet();
+		int i_cds = 0;
+		int i_pro = 0;
+		for(String n_s: nucleotide_sequences) {
+			URI feature_type = sequence_map.get(n_s).iterator().next().getRoles().iterator().next();
+			String feature_info = sequence_map.get(n_s).iterator().next().getName();
+			String feature_id = SO.getName(feature_type);
+			if (feature_type.equals(SO.PROMOTER)) {
+				++i_pro;
+				feature_id = feature_id + Integer.toString(i_pro);
+			}
+			if (feature_type.equals(SO.CDS)) {
+				++i_cds;
+				feature_id = feature_id + Integer.toString(i_cds);
+			}
+			System.out.println("Creating " + feature_id);
+			Sequence part_seq = doc.createSequence(feature_id + "_seq", n_s, Sequence.IUPAC_DNA);
+			ComponentDefinition part = doc.createComponentDefinition(feature_id, ComponentDefinition.DNA);
+			part.setName(feature_info);
+			part.addSequence(part_seq);
+			part.addRole(feature_type);
+		}
+		SBOLWriter.write(doc, file_name);		
+	}
+
+	public static void pushToPartShop(String project_dir, String file_name) throws IOException, SBOLValidationException, SBOLConversionException, SynBioHubException {
+		SBOLDocument doc = SBOLReader.read(project_dir + "/" + file_name);	
+		String bbn_repo_url = "https://synbiohub.bbn.com";
+		SynBioHubFrontend bbn_repo = new SynBioHubFrontend(bbn_repo_url);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Logging into " + bbn_repo_url);
+		System.out.print("Enter email: ");
+		String email = reader.readLine();
+		System.out.print("Enter password: ");
+		String pword = reader.readLine();
+		bbn_repo.login(email, pword);
+		bbn_repo.createCollection("elm_parts", "1", "elm_parts", "A parts kit for morphogenetic circuits", "test", true, project_dir + "/" + file_name);
+		System.out.println("Submitted.");	
+	}
+	
+	// Creates a ModuleDefinition that includes a bunch of ComponentDefinitions
+	static ModuleDefinition createModuleDefinition(String displayId, ComponentDefinition[] components) throws SBOLValidationException, URISyntaxException {
+		ModuleDefinition mdef = elm_part_shop.createModuleDefinition(displayId);
+		ComponentDefinition cdef = elm_part_shop.createComponentDefinition(displayId + "_structure", ComponentDefinition.DNA);
+		cdef.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000001"));
+		mdef.createAnnotation(STRUCTURE_PROPERTY, cdef.getIdentity());
+		for (ComponentDefinition component : components) {
+			FunctionalComponent component_fc = mdef.createFunctionalComponent(component.getDisplayId() + "_fc", AccessType.PUBLIC, component.getIdentity(),DirectionType.NONE);
+			Component component_c = cdef.createComponent(component.getDisplayId()  + "_c", AccessType.PUBLIC, component.getIdentity());
+			component_fc.createAnnotation(STRUCTURE_PROPERTY, component_c.getIdentity());
+		}
+		return mdef;
+	}
+
+	// Creates a ModuleDefinition that includes a bunch of ComponentDefinitions
+	static ModuleDefinition createModuleDefinition(String displayId, ComponentDefinition[] inputs, ComponentDefinition[] outputs) throws SBOLValidationException, URISyntaxException {
+		ModuleDefinition mdef = elm_part_shop.createModuleDefinition(displayId);
+		ComponentDefinition cdef = elm_part_shop.createComponentDefinition(displayId + "_structure", ComponentDefinition.DNA);
+		cdef.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000001"));
+		mdef.createAnnotation(STRUCTURE_PROPERTY, cdef.getIdentity());
+		for (ComponentDefinition component : inputs) {
+			FunctionalComponent component_fc = mdef.createFunctionalComponent(component.getDisplayId() + "_fc", AccessType.PUBLIC, component.getIdentity(),DirectionType.NONE);
+			Component component_c = cdef.createComponent(component.getDisplayId()  + "_c", AccessType.PUBLIC, component.getIdentity());
+			component_fc.setDirection(DirectionType.OUT);
+			component_fc.createAnnotation(STRUCTURE_PROPERTY, component_c.getIdentity());
+		}
+		for (ComponentDefinition component : outputs) {
+			FunctionalComponent component_fc = mdef.createFunctionalComponent(component.getDisplayId() + "_fc", AccessType.PUBLIC, component.getIdentity(),DirectionType.NONE);
+			Component component_c = cdef.createComponent(component.getDisplayId()  + "_c", AccessType.PUBLIC, component.getIdentity());
+			component_fc.setDirection(DirectionType.OUT);
+			component_fc.createAnnotation(STRUCTURE_PROPERTY, component_c.getIdentity());
+		}
+		return mdef;
+	}
+	
+	static void assemblePrimaryStructure(ModuleDefinition mdef) throws SBOLValidationException {
+		URI cdef_id = mdef.getAnnotation(STRUCTURE_PROPERTY).getURIValue();
+		ComponentDefinition cdef = elm_part_shop.getComponentDefinition(cdef_id);
+		Component[] components = cdef.getComponents().toArray(new Component[0]);
+		if (components.length < 2)
+			return;
+		for (Integer i_c = 0; i_c < components.length - 1; ++i_c) {
+			SequenceConstraint sc = cdef.createSequenceConstraint("sc_" + i_c.toString(), RestrictionType.PRECEDES, components[i_c].getIdentity(), components[i_c+1].getIdentity());
+		}
+		return;
+	}
+
+	static void assemblePrimaryStructure(ModuleDefinition mdef, ComponentDefinition[] primary_structure) throws Exception {
+		if (primary_structure.length < 2)
+			return;
+		URI cdef_id = mdef.getAnnotation(STRUCTURE_PROPERTY).getURIValue();
+		ComponentDefinition cdef = elm_part_shop.getComponentDefinition(cdef_id);
+		ArrayList<Component> module_components = new ArrayList(cdef.getComponents()); 
+		ArrayList<Component> sorted_components = new ArrayList(); 
+		for (ComponentDefinition cd : primary_structure)
+			for (Component c : module_components)
+				if (c.getDefinition().equals(cd))
+					sorted_components.add(c);
+		for (Component c : module_components)
+			System.out.println(c.getDefinitionIdentity());
+		
+		// Validate that ComponentDefinitions in primary_structure are part of this ModuleDefinition
+		if (sorted_components.size() != module_components.size())
+			throw new Exception("Failed to assemble primary structure. One of the ComponentDefinitions is not part of the ModuleDefinition");
+
+
+		for (Integer i_c = 0; i_c < sorted_components.size() - 1; ++i_c) {
+			SequenceConstraint sc = cdef.createSequenceConstraint("sc_" + i_c.toString(), RestrictionType.PRECEDES, sorted_components.get(i_c).getIdentity(), sorted_components.get(i_c+1).getIdentity());
+		}
+		return;
+	}
+	
+	static ModuleDefinition createConsitutivePromoterModule(String displayId, ComponentDefinition promoter) throws SBOLValidationException, URISyntaxException {
+		ModuleDefinition mdef = createModuleDefinition(displayId, new ComponentDefinition[] { promoter } ); 
+		mdef.addRole(new URI(CONSTITUTIVE_MODULE));
+		FunctionalComponent promoter_fc = mdef.getFunctionalComponents().iterator().next();
+		promoter_fc.setDirection(DirectionType.OUT);
+		return mdef;
+	}
+	
+	static ModuleDefinition createExpressionModule(String displayId, ComponentDefinition promoter, ComponentDefinition cds) throws SBOLValidationException, URISyntaxException {
+		ModuleDefinition mdef = createModuleDefinition(displayId, new ComponentDefinition[] {promoter, cds});
+		for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+			if (fc.getDefinition().equals(promoter))
+				fc.setDirection(DirectionType.IN);
+		}
+		mdef.addRole(new URI(EXPRESSION_MODULE));
+		if (displayId.contains("Cdh"))
+			mdef.createAnnotation(PERCOLATION_FACTOR, 100.0);
+		return mdef;
+	}
+	
+	static ModuleDefinition createRegulationModule(String displayId, ComponentDefinition input_promoter, ComponentDefinition tf, ComponentDefinition target_promoter) throws SBOLValidationException, URISyntaxException {
+		ModuleDefinition mdef = createModuleDefinition(displayId, new ComponentDefinition[] { input_promoter, tf, target_promoter });
+		for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+			if (fc.getDefinition().equals(input_promoter))
+				fc.setDirection(DirectionType.IN);
+			if (fc.getDefinition().equals(target_promoter))
+				fc.setDirection(DirectionType.OUT);
+		}
+		mdef.addRole(new URI(REGULATION_MODULE));
+		return mdef;
+	}
+	
+	static ModuleDefinition createRecombinationModule(String displayId, ComponentDefinition recombinase, ComponentDefinition attP, ComponentDefinition attB) throws SBOLValidationException, URISyntaxException {
+		ModuleDefinition mdef = createModuleDefinition(displayId, new ComponentDefinition[] { recombinase, attP, attB });
+		for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+			if (fc.getDefinition().equals(attP))
+				fc.setDirection(DirectionType.OUT);
+			if (fc.getDefinition().equals(attB))
+				fc.setDirection(DirectionType.OUT);
+			if (fc.getDefinition().equals(recombinase))
+				fc.setDirection(DirectionType.IN);
+		}
+		mdef.addRole(new URI(RECOMBINATION_MODULE));
+		return mdef;
+	}
+
+	static ModuleDefinition createGenericRecombinationModule(String displayId) throws SBOLValidationException, URISyntaxException {
+		ComponentDefinition recombinase = elm_part_shop.createComponentDefinition(displayId + "_recombinase", ComponentDefinition.DNA);
+		ComponentDefinition attP = elm_part_shop.createComponentDefinition(displayId + "_attP", ComponentDefinition.DNA);
+		ComponentDefinition attB = elm_part_shop.createComponentDefinition(displayId + "_attB", ComponentDefinition.DNA);
+		recombinase.addRole(SequenceOntology.CDS);
+		attP.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000942"));
+		attB.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000943"));
+		ModuleDefinition mdef = createModuleDefinition(displayId, new ComponentDefinition[] { recombinase, attP, attB });
+		for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+			if (fc.getDefinition().equals(attP))
+				fc.setDirection(DirectionType.OUT);
+			if (fc.getDefinition().equals(attB))
+				fc.setDirection(DirectionType.OUT);
+			if (fc.getDefinition().equals(recombinase))
+				fc.setDirection(DirectionType.IN);
+		}
+		mdef.addRole(new URI(RECOMBINATION_MODULE));
+		return mdef;
+	}
+	
+	static ModuleDefinition createDifferentiationSwitch(String displayId, ComponentDefinition promoter, ComponentDefinition terminator_1, ComponentDefinition reporter_1, ComponentDefinition terminator_2, ComponentDefinition reporter_2) throws Exception {
+
+		ComponentDefinition attP_site1 = elm_part_shop.getComponentDefinition("attP_site1", "");
+		ComponentDefinition attB_site1 = elm_part_shop.getComponentDefinition("attB_site1", "");
+		ComponentDefinition attP_site2 = elm_part_shop.getComponentDefinition("attP_site2", "");
+		ComponentDefinition attB_site2 = elm_part_shop.getComponentDefinition("attB_site2", "");
+
+		ComponentDefinition[] components = { promoter, attP_site1, attB_site1, terminator_1, attP_site2, reporter_1, terminator_2, attB_site2, reporter_2 };
+		ModuleDefinition mdef = createModuleDefinition(displayId, components);
+		mdef.addRole(new URI(DIFFERENTIATION_MODULE));
+		assemblePrimaryStructure(mdef, components);
+		// Reset Direction of promoter's FunctionalComponent
+		for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+			if (fc.getDefinition().equals(attP_site1)) {
+				fc.setDirection(DirectionType.IN);
+			}
+			if (fc.getDefinition().equals(attB_site1)) {
+				fc.setDirection(DirectionType.IN);
+			}
+			if (fc.getDefinition().equals(attP_site2)) {
+				fc.setDirection(DirectionType.IN);
+			}
+			if (fc.getDefinition().equals(attB_site2)) {
+				fc.setDirection(DirectionType.IN);
+			}
+		}
+		return mdef;
+	}
+
+	static ModuleDefinition createGenericDifferentiationSwitch(String displayId) throws Exception {
+		// Generic recombination sites, these inputs will be connected to recombinase outputs of the upstream module
+		ComponentDefinition attP_site1 = elm_part_shop.createComponentDefinition(displayId + "_recombination_site1_attP", ComponentDefinition.DNA);
+		ComponentDefinition attB_site1 = elm_part_shop.createComponentDefinition(displayId + "_recombination_site1_attB", ComponentDefinition.DNA);
+		ComponentDefinition attP_site2 = elm_part_shop.createComponentDefinition(displayId + "_recombination_site2_attP", ComponentDefinition.DNA);
+		ComponentDefinition attB_site2 = elm_part_shop.createComponentDefinition(displayId + "_recombination_site2_attB", ComponentDefinition.DNA);
+		attP_site1.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000942"));
+		attB_site1.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000943"));
+		attP_site2.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000942"));
+		attB_site2.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000943"));		
+		attP_site1.createAnnotation(SITE_INDEX, 0);
+		attB_site1.createAnnotation(SITE_INDEX, 0);
+		attP_site2.createAnnotation(SITE_INDEX, 1);
+		attB_site2.createAnnotation(SITE_INDEX, 1);
+
+		// Generic recombinase sites, these outputs will be connected to inputs of the downstream module
+		ComponentDefinition recombinase_output_1 = elm_part_shop.createComponentDefinition(displayId + "_recombinase_1", ComponentDefinition.DNA);
+		recombinase_output_1.addRole(SequenceOntology.CDS);
+		ComponentDefinition recombinase_output_2 = elm_part_shop.createComponentDefinition(displayId + "_recombinase_2", ComponentDefinition.DNA);
+		recombinase_output_2.addRole(SequenceOntology.CDS);
+
+		ComponentDefinition[] components = { attP_site1, attB_site1, attP_site2, attB_site2, recombinase_output_1, recombinase_output_2 };		
+		ModuleDefinition mdef = createModuleDefinition(displayId, components);
+
+		// Configure inputs and outputs of the differentiation switch
+		for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+			if (fc.getDefinition().equals(attP_site1)) {
+				fc.setDirection(DirectionType.IN);
+			}
+			if (fc.getDefinition().equals(attB_site1)) {
+				fc.setDirection(DirectionType.IN);
+			}
+			if (fc.getDefinition().equals(attP_site2)) {
+				fc.setDirection(DirectionType.IN);
+			}
+			if (fc.getDefinition().equals(attB_site2)) {
+				fc.setDirection(DirectionType.IN);
+			}
+			if (fc.getDefinition().equals(recombinase_output_1)) {
+				fc.setDirection(DirectionType.OUT);
+			}
+			if (fc.getDefinition().equals(recombinase_output_2)) {
+				fc.setDirection(DirectionType.OUT);
+			}
+		}
+		return mdef;
+	}
+	
+	static ModuleDefinition createDifferentiationCascade(String displayId, ModuleDefinition recombination_module_1, ModuleDefinition recombination_module_2, double expression_level, double recombination_efficiency_1, double recombination_efficiency_2) throws Exception {
+
+		// Create submodules from the differntiation switch and recombination modules
+		ModuleDefinition differentiation_switch = ELMPartShop.createGenericDifferentiationSwitch(displayId + "_differentiation_switch");
+
+		// Externally facing, module interface components
+		ComponentDefinition attP_input_1 = null;  // Inputs come from differentiation switch submodule
+		ComponentDefinition attB_input_1 = null;
+		ComponentDefinition attP_input_2 = null;
+		ComponentDefinition attB_input_2 = null;
+		ComponentDefinition attP_output_1 = null;  // Outputs come from recombination submodules
+		ComponentDefinition attB_output_1 = null;
+		ComponentDefinition attP_output_2 = null;
+		ComponentDefinition attB_output_2 = null;
+		
+		for (FunctionalComponent fc : differentiation_switch.getFunctionalComponents())
+		{
+			ComponentDefinition cdef = fc.getDefinition();
+			URI role = cdef.getRoles().iterator().next();
+			if (role.equals(SO.getURIbyName("attP_site")))
+			{
+				System.out.println(cdef);
+				int site_index = cdef.getAnnotation(SITE_INDEX).getIntegerValue();
+				if (site_index == 0)
+					attP_input_1 = cdef;
+				else if (site_index == 1)
+					attP_input_2 = cdef;
+			}
+			if (role.equals(SO.getURIbyName("attB_site")))
+			{
+				int site_index = cdef.getAnnotation(SITE_INDEX).getIntegerValue();
+				if (site_index == 0)
+					attB_input_1 = cdef;
+				else if (site_index == 1)
+					attB_input_2 = cdef;
+			}
+		}
+		for (FunctionalComponent fc : recombination_module_1.getFunctionalComponents())
+		{
+			ComponentDefinition cdef = fc.getDefinition();
+			URI role = cdef.getRoles().iterator().next();
+			if (role.equals(SO.getURIbyName("attP_site")))
+				attP_output_1 = cdef;
+			else if (role.equals(SO.getURIbyName("attB_site")))
+				attB_output_1 = cdef;
+		}
+		for (FunctionalComponent fc : recombination_module_2.getFunctionalComponents())
+		{
+			ComponentDefinition cdef = fc.getDefinition();
+			URI role = cdef.getRoles().iterator().next();
+			if (role.equals(SO.getURIbyName("attP_site")))
+				attP_output_2 = cdef;
+			else if (role.equals(SO.getURIbyName("attB_site")))
+				attB_output_2 = cdef;
+		}	
+		
+		// Internally facing, submodule interface components
+		ComponentDefinition recombinase_output_1 = null;
+		ComponentDefinition recombinase_output_2 = null;
+		ComponentDefinition recombinase_input_1 = null;
+		ComponentDefinition recombinase_input_2 = null;
+
+		for (FunctionalComponent fc : differentiation_switch.getFunctionalComponents())
+		{
+			if (fc.getDirection().equals(DirectionType.OUT))
+				recombinase_output_1 = fc.getDefinition();
+			break;
+		}
+		for (FunctionalComponent fc : differentiation_switch.getFunctionalComponents())
+		{
+			if (fc.getDirection().equals(DirectionType.OUT))
+				if (fc.getDefinition().equals(recombinase_output_1))
+					continue;
+				else
+					recombinase_output_2 = fc.getDefinition();
+		}
+		for (FunctionalComponent fc : recombination_module_1.getFunctionalComponents())
+		{
+			if (fc.getDirection().equals(DirectionType.IN))
+				recombinase_input_1 = fc.getDefinition();
+		}
+		for (FunctionalComponent fc : recombination_module_2.getFunctionalComponents())
+		{
+			if (fc.getDirection().equals(DirectionType.IN))
+				recombinase_input_2 = fc.getDefinition();
+		}
+
+		ModuleDefinition cascade = createModuleDefinition(displayId,
+				new ComponentDefinition[] {attP_input_1, attB_input_1, attP_input_2, attB_input_2, attP_output_1, attB_output_1, attP_output_2, attB_output_2});
+		cascade.addRole(new URI(DIFFERENTIATION_CASCADE));
+		assemble(cascade, new ModuleDefinition[] {differentiation_switch, recombination_module_1, recombination_module_2});
+
+		connect(cascade, recombinase_output_1, recombinase_input_1, elm_part_shop);
+		connect(cascade, recombinase_output_2, recombinase_input_2, elm_part_shop);
+
+		cascade.createAnnotation(EXPRESSION_LEVEL, expression_level);
+		cascade.createAnnotation(RECOMBINATION_EFFICIENCY, recombination_efficiency_1);
+		cascade.createAnnotation(RECOMBINATION_EFFICIENCY, recombination_efficiency_2);
+		return cascade;
+	}
+	
+	// Creates a ModuleDefinition that includes a bunch of ComponentDefinitions
+	static ModuleDefinition createHostModule(String displayId) throws SBOLValidationException, URISyntaxException {
+		ModuleDefinition mdef = createModuleDefinition(displayId, new ComponentDefinition[] {});
+		mdef.addRole(new URI(HOST_MODULE));
+		mdef.createAnnotation(CELL_DIAMETER, "0.00001");
+		return mdef;
+	}
+	
+	// Creates a ModuleDefinition that includes a bunch of ComponentDefinitions
+	static ModuleDefinition createMediumModule(String displayId) throws SBOLValidationException, URISyntaxException {
+		ModuleDefinition mdef = createModuleDefinition(displayId, new ComponentDefinition[] {});
+		mdef.addRole(new URI(MEDIUM_MODULE));
+		return mdef;
+	}	
+
+	public static void assemble(ModuleDefinition mdef, ModuleDefinition[] submodules) throws SBOLValidationException {
+		for (ModuleDefinition submoduledef : submodules) {
+			Module submodule = mdef.createModule(submoduledef.getDisplayId(), submoduledef.getIdentity());
+		}
+	}
+
+	public static void connect(ModuleDefinition mdef, ComponentDefinition male, ComponentDefinition female, SBOLDocument doc) throws SBOLValidationException {
+		int i = 0;
+		String display_id = "bridge_0";
+		ComponentDefinition bridge = null;
+		while (bridge == null) {
+		    try {
+		    	bridge = doc.createComponentDefinition(display_id, male.getTypes());
+		    } catch (SBOLValidationException e) {
+		    	i++;
+		    	display_id = "bridge_" + i;
+		    }
+		}		
+		FunctionalComponent bridge_fc = mdef.createFunctionalComponent(display_id, AccessType.PUBLIC, bridge.getIdentity(), DirectionType.NONE);
+		override(mdef, male, bridge);
+		override(mdef, bridge, female);	
+	}
+	
+	// Warning: This assumes there is only one FunctionalComponent per ComponentDefinition (which may not always be true)
+	// @todo Handle case that multiple MapsTo instances with the same ID are instantiated
+	public static void override(ModuleDefinition mdef, ComponentDefinition mask, ComponentDefinition masked) throws SBOLValidationException {		
+		ModuleDefinition local_mdef = mdef;
+		ModuleDefinition remote_mdef = null;
+		FunctionalComponent local = null;
+		FunctionalComponent remote = null;
+		RefinementType refinement = null;
+		// Identify the FunctionalComponent in the local level of the hierarchy.  
+		// Does it correspond to the mask or masked ComponentDefinition?
+		// Set the refinement accordingly
+		for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+			if (fc.getDefinition() == mask) {
+				if (refinement != null)
+					throw new RuntimeException("Call to override method failed. Both components occupy the local level of the Module hierarchy");
+				refinement = RefinementType.USELOCAL;
+				local = fc;
+			}
+			else if (fc.getDefinition() == masked) {
+				if (refinement != null)
+					throw new RuntimeException("Call to override method failed. Both components occupy the local level of the Module hierarchy");
+				refinement = RefinementType.USEREMOTE;
+				local = fc;
+			}
+		}
+		if (local == null)
+			throw new RuntimeException("Call to connect method failed. Could not identify a local component");
+		
+		
+		// Identify the FunctionalComponent in the remote level of the hierarchy.  Does it correspond to the mask or masked ComponentDefinition?
+		Module remote_module = null;
+		for (Module submodule : mdef.getModules()) {
+			ModuleDefinition submoduledef = submodule.getDefinition();
+			for (FunctionalComponent fc : submoduledef.getFunctionalComponents()) {
+				if (fc.getDefinition() == mask || fc.getDefinition() == masked)
+				{
+					remote = fc;
+					remote_module = submodule;
+				}
+			}
+		}
+		if (remote_module == null)
+			throw new RuntimeException("Call to connect method failed. Could not identify a remote component");
+		
+		int i = 0;
+		String display_id = "connection_0";
+		MapsTo new_connection = null;
+		while (new_connection == null) {
+		    try {
+				new_connection = remote_module.createMapsTo(display_id, refinement, local.getIdentity(), remote.getIdentity());
+		    } catch (SBOLValidationException e) {
+		    	i++;
+		    	display_id = "connection_" + i;
+		    }
+		}		
+	}
+}
+
+
+
+
+//// Parse with BioJava
+//File dnaFile = new File("./genbank/pEXPR.gb");     
+//
+//LinkedHashMap<String, DNASequence> dnaSequences = GenbankReaderHelper.readGenbankDNASequence( dnaFile );
+//for (DNASequence sequence : dnaSequences.values()) {
+//   System.out.println( sequence.getSequenceAsString() );
+// }
+
+
+
+
+
+
+
+
+

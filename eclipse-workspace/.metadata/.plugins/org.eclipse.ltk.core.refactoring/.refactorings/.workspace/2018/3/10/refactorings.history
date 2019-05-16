@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Delete 5 resources" deleteContents="false" description="Delete 5 resources" element1="/git_protelis-morphogen" element2="/morphogen-interpreter" element3="/morphogen-lang" element4="/morphogen-test" element5="/protelis-morphogen" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="5" stamp="1520375211982"/>&#x0A;<refactoring comment="Delete resource &apos;ELM parts&apos;" deleteContents="false" description="Delete resource &apos;ELM parts&apos;" element1="/ELM parts" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1520434710617"/>
+</session>

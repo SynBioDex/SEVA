@@ -1,0 +1,596 @@
+package com.bbn.FACETS;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import javax.xml.namespace.QName;
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+import org.xml.sax.*;
+import org.w3c.dom.*;
+import org.apache.commons.io.FileUtils;
+import org.sbolstandard.core2.AccessType;
+import org.sbolstandard.core2.Annotation;
+import org.sbolstandard.core2.Component;
+import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.DirectionType;
+import org.sbolstandard.core2.FunctionalComponent;
+import org.sbolstandard.core2.Interaction;
+import org.sbolstandard.core2.ModuleDefinition;
+import org.sbolstandard.core2.Participation;
+import org.sbolstandard.core2.SBOLConversionException;
+import org.sbolstandard.core2.SBOLDocument;
+import org.sbolstandard.core2.SBOLValidationException;
+import org.sbolstandard.core2.SystemsBiologyOntology;
+import org.synbiohub.frontend.SynBioHubException;
+
+public class Sorting {
+    private static Logger log = Logger.getGlobal();
+    static final String defaultNamespace = "https://bbn.com";
+
+    /*** CONSTANTS ***/
+    private static final double HEK_CELL_DIAMETER = 1.0e-5;
+    public static final String INTERIOR = "INTERIOR";
+    public static final String EXTERIOR = "EXTERIOR";
+    public static final String DOTS = "DOTS";
+    public static final String NOTS = "NOTS";
+
+    /*** MODULE COLLECTION ***/
+    private static final String HEKCHOSortedBall = "HEKCHOSortedBall";
+
+    /*** COMPONENT COLLECTION ***/
+    private static final String CHO_CELL = "CHO_CELL";
+    private static final String HEK293_CELL = "HEK293_CELL";
+
+    /*** COMPONENT PARAMETERS ***/
+    public static final QName CELL_DIAMETER = new QName("http://bbn.com/FACETS/", "diameter", "facets");
+    public static final QName PERCOLATION_FACTOR = new QName("http://bbn.com/FACETS/", "interactionDistance", "facets");
+
+    /*** CUSTOM IDENTIFIERS FOR MODULE DEFINITION ROLES ***/
+    private static final String EXPRESSION_MODULE = defaultNamespace + "/expression";
+    private static final String CONSTITUTIVE_MODULE = defaultNamespace + "/constitutive";
+    private static final String REGULATION_MODULE = defaultNamespace + "/regulation";
+    private static final String RECOMBINATION_MODULE = defaultNamespace + "/recombination";
+    private static final String DIFFERENTIATION_MODULE = defaultNamespace + "/differentiation";
+    private static final String HOST_MODULE = defaultNamespace + "/host";
+    private static final String MEDIUM_MODULE = "http://purl.obolibrary.org/obo/OBI_0000079";
+
+    public static final QName STRUCTURE_PROPERTY = new QName("http://bbn.com/FACETS/", "structure", "facets");
+
+    /*** ANNOTATIONS ON INTERACTIONS ***/
+    public static final QName CONTACT_ENERGY = new QName("http://bbn.com/FACETS/", "contactEnergy", "facets");
+
+    /**
+     * Create a sorted ball out of HEK and CHO cells.
+     * The "ball" is only about 0.3x as high as it is wide
+     * @param diameter number of meters in diameter
+     * @param fraction Fraction HEK: must be at least 0.75
+     * @return Ports identifying HEK and CHO as the outputs
+     */
+    private static final double HEK_BALL_ASPECT_RATIO = 0.3;
+    public static Map<String, ModulePorts> HEKCHOSortedBall(double diameter, double fraction) throws SBOLValidationException, CircuitBuilderException, IOException, SBOLConversionException, URISyntaxException, SynBioHubException {
+        if (fraction < 0.75) {
+            throw new CircuitBuilderException("HEK fraction " + fraction + " is not enough to ensure a coherent interior");
+        }
+        log.info("HEKCHOSortedBall(" + diameter + ", " + fraction + ") called, trying to make HEKCHOSortedBall");
+
+        // Create basic instance
+        CircuitBuilder builder = null;
+        if (CircuitBuilder.isInitialized()) {
+            builder = CircuitBuilder.instance();
+        } else {
+            builder = new CircuitBuilder(HEKCHOSortedBall);
+        }
+        int params = (int)fraction + 10; // todo brian remove + clear up parameters for sorting
+        Map<String, ModulePorts> positionedModules = ensureModule(HEKCHOSortedBall, params);
+        log.info("made HEKCHOSortedBall, its ModuleDefinition = " + builder.getSystem().toString());
+
+        // Ellipsoid volume: 4/3 pi ABC --> 4/3 pi 0.3 diam^3
+        double ballVolume = 4.0 / 3.0 * Math.PI * HEK_BALL_ASPECT_RATIO * Math.pow(diameter / 2, 3);
+        double cellVolume = 4.0 / 3.0 * Math.PI * Math.pow(HEK_CELL_DIAMETER / 2, 3);
+        double cells = ballVolume / cellVolume;
+        // Compute and apply
+        double hekCount = Math.round(cells * fraction);
+        double choCount = Math.round(cells * (1 - fraction));
+
+        if (cells < 100 || cells > 1e5) {
+            throw new CircuitBuilderException("Require number of cells  " + cells + " is out of predicted functional range");
+        }
+
+        // add any interactions/annotations that are common to only HEKCHOSortedBall
+        ModulePorts hek = positionedModules.get(INTERIOR);
+        FunctionalComponent hekFCInstance = hek.getSystemInstance(hek.getDefinition().getDisplayId());
+        log.info(hek.getDefinition().getDisplayId() + "\t" + hek.getDefinition().toString());
+        log.info("adding dosage to ModulePort corresponding to '" + hek.getDefinition().getDisplayId() + "': " + CircuitBuilder.DOSAGE.getNamespaceURI());
+        hekFCInstance.createAnnotation(CircuitBuilder.DOSAGE, hekCount);
+
+        ModulePorts cho = positionedModules.get(EXTERIOR);
+        FunctionalComponent choFCInstance = cho.getSystemInstance(cho.getDefinition().getDisplayId());
+        log.info(cho.getDefinition().getDisplayId() + "\t" + cho.getDefinition().toString());
+        log.info("adding dosage to ModulePort corresponding to '" + cho.getDefinition().getDisplayId() + "': " + CircuitBuilder.DOSAGE.getNamespaceURI());
+        choFCInstance.createAnnotation(CircuitBuilder.DOSAGE, choCount);
+
+        log.info("made HEKCHOSortedBall, HEK is INTERIOR and CHO is EXTERIOR");
+        return positionedModules;
+    }
+
+    public static ModulePorts twoCHOSortedBall(double diameter, double fraction) {
+        throw new RuntimeException("twoCHOSortedBall is not yet implemented");
+    }
+
+    /**
+     * Create a spheroid of HEK cells interspersed with speckles of CHO cells
+     * @param morphogen_id Identity of the CircuitBuilder
+     * @param speckle_diameter Number of meters in diameter
+     * @param clusters Total number of speckles
+     * @param parts_list A set of parameterized, biological parts that can be used to
+     * @return Ports identifying HEK and CHO as the outputs
+     */
+    public static ModulePorts speckledBall(String morphogen_id, double speckle_diameter, Integer clusters, Set<ModuleDefinition> parts_list) throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException, CircuitBuilderException, SynBioHubException {
+
+        CircuitBuilder morphogen = new CircuitBuilder(morphogen_id);
+        //morphogen.createModuleDefinition()
+
+        ArrayList<ModuleDefinition> parts = new ArrayList<ModuleDefinition>();
+        ArrayList<ModuleDefinition> expression_modules = new ArrayList<ModuleDefinition>();
+        ArrayList<ModuleDefinition> constitutive_modules = new ArrayList<ModuleDefinition>();
+        ArrayList<ModuleDefinition> regulation_modules = new ArrayList<ModuleDefinition>();
+        ArrayList<ModuleDefinition> host_modules = new ArrayList<ModuleDefinition>();
+        ArrayList<ModuleDefinition> medium_modules = new ArrayList<ModuleDefinition>();
+        ArrayList<ModuleDefinition> cell_type_modules = new ArrayList<ModuleDefinition>();
+
+        for (ModuleDefinition part : parts_list) {
+            ModuleDefinition imported_part = morphogen.importModule(part.getIdentity());
+            parts.add(imported_part);
+        }
+
+        for (ModuleDefinition part : parts) {
+            if (part.getRoles().size() > 0) {
+                switch (part.getRoles().iterator().next().toString()) {
+                case EXPRESSION_MODULE:
+                    if (part.getAnnotation(PERCOLATION_FACTOR) != null)
+                        expression_modules.add(part);
+                    break;
+                case CONSTITUTIVE_MODULE:
+                    constitutive_modules.add(part);
+                    break;
+                case REGULATION_MODULE:
+                    regulation_modules.add(part);
+                    break;
+                case HOST_MODULE:
+                    host_modules.add(part);
+                    break;
+                case MEDIUM_MODULE:
+                    medium_modules.add(part);  // Medium is treated as just another cell type in CC3D Models
+                    break;
+                }
+                System.out.println(part.getIdentity() + "\t" + part.getRoles().iterator().next());
+            }
+        }
+        if (medium_modules.size() < 1)
+            throw new CircuitBuilderException("A Medium module is required and was not found");
+        if (host_modules.size() < 2)
+            throw new CircuitBuilderException("Host modules not found");
+        if (expression_modules.size() < 1)
+            throw new CircuitBuilderException("Expression modules not found");
+        if (constitutive_modules.size() + regulation_modules.size() < 1)
+            throw new CircuitBuilderException("Promoter modules not found");
+
+        System.out.println("Imported Medium Modules:");
+        for (ModuleDefinition md : medium_modules)
+            System.out.println(md.getIdentity());
+
+        System.out.println("Imported Host Modules:");
+        for (ModuleDefinition md : host_modules)
+            System.out.println(md.getIdentity());
+
+        System.out.println("Imported Expression Modules:");
+        for (ModuleDefinition md : expression_modules)
+            System.out.println(md.getIdentity());
+
+        System.out.println("Imported Promoter Modules:");
+        for (ModuleDefinition md : constitutive_modules)
+            System.out.println(md.getIdentity());
+
+        for (ModuleDefinition host : host_modules) {
+            System.out.println(host.getDisplayId());
+            Annotation ann = host.getAnnotation(CELL_DIAMETER);
+            if (ann == null)
+                throw new CircuitBuilderException(host.getIdentity() + " does not have diameter");
+            else
+                System.out.println(host.getIdentity() + " has diameter of " + ann.getStringValue());
+
+            double cellDiameter = Double.parseDouble(ann.getStringValue());
+            for (ModuleDefinition part : expression_modules) {
+                ann = part.getAnnotation(PERCOLATION_FACTOR);
+                double percolationFactor = Double.parseDouble(ann.getStringValue());
+                double fraction = Math.PI * Math.pow(speckle_diameter / 2.0, 2.0) / percolationFactor;
+                double N = clusters * percolationFactor;
+                double cultivationDays = 4.0;
+                double N0 = N / Math.pow(2, cultivationDays);
+                double totalArea = N * Math.PI * Math.pow(cellDiameter / 2.0, 2.0);
+                double totalVolume = N * 4.0 / 3.0 * Math.PI * Math.pow(cellDiameter / 2.0, 3.0);
+                System.out.println("Part's identity: " + part.getIdentity());
+                System.out.println("Percolation factor: " + percolationFactor);
+                System.out.println("Fraction: " + fraction);
+                System.out.println("Total cells: " + N);
+                System.out.println("Seed count: " + N0);
+                System.out.println("Total area: " + totalArea);
+            }
+        }
+
+        cell_type_modules.addAll(medium_modules);
+        cell_type_modules.addAll(host_modules);
+
+        // Copy base CC3D model
+        String MODEL_PATH = "models/HEK-CHO/";
+        File MODEL_DIR = new File(Sorting.class.getClassLoader().getResource(MODEL_PATH).getPath());
+        FileUtils.copyDirectory(MODEL_DIR, new File(morphogen_id));
+
+        // Parse XML into DOM
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        Document dom = null;
+        DocumentBuilder db = null;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        try {
+            dom = db.parse(MODEL_DIR + "/Simulation/cellsorting.xml");
+        } catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // Find Contact plugin
+        Node cc3d_contact_plugin = null;
+        Node cc3d_celltype_plugin = null;
+        Node cc3d_volume_plugin = null;
+        NodeList nl = dom.getElementsByTagName("Plugin");
+        for (int i_n = 0; i_n < nl.getLength(); i_n++) {
+            Node n = nl.item(i_n);
+            switch (n.getAttributes().getNamedItem("Name").getTextContent()) {
+            case "Contact" :
+                cc3d_contact_plugin = n;
+                break;
+            case "CellType" :
+                cc3d_celltype_plugin = n;
+                break;
+            case "Volume" :
+                cc3d_volume_plugin = n;
+                break;
+            }
+        }
+
+        // Set Cell Types & Volume Energies
+        for (int i_m = 0; i_m < cell_type_modules.size(); ++i_m) {
+            ModuleDefinition cell_type = cell_type_modules.get(i_m);
+            Element cell_type_node = dom.createElement("CellType");
+            cell_type_node.setAttribute("TypeId", String.valueOf(i_m));
+            cell_type_node.setAttribute("TypeName", cell_type.getDisplayId());
+            cc3d_celltype_plugin.appendChild(cell_type_node);
+
+            Element volume_node = dom.createElement("VolumeEnergyParameters");
+            volume_node.setAttribute("CellType", cell_type.getDisplayId());
+            volume_node.setAttribute("LambdaVolume", String.valueOf(2));
+            volume_node.setAttribute("TargetVolume", String.valueOf(50));
+            cc3d_volume_plugin.appendChild(volume_node);
+        }
+
+        // Set intercellular Contact Energies
+        for (int i = 0; i < cell_type_modules.size(); ++i) {
+            for (int j = 0; j <= i; ++j) {
+                ModuleDefinition m_i = cell_type_modules.get(i);
+                ModuleDefinition m_j = cell_type_modules.get(j);
+                Interaction i_ij = null;
+                for (Interaction i_ : m_i.getInteractions()) {
+                    for (Participation p : i_.getParticipations()) {
+                        URI cd_i = p.getParticipant().getDefinitionURI();
+                        URI cd_j = m_j.getAnnotation(STRUCTURE_PROPERTY).getURIValue();
+                        if (cd_i.equals(cd_j)) {
+                            i_ij = i_;
+                        }
+                    }
+                }
+                if (i_ij == null) continue;
+                Annotation contact_energy = i_ij.getAnnotation(CONTACT_ENERGY);
+                Element energy_node = dom.createElement("Energy");
+                energy_node.setAttribute("Type1", m_i.getDisplayId());
+                energy_node.setAttribute("Type2", m_j.getDisplayId());
+                energy_node.setTextContent(contact_energy.getStringValue());
+                cc3d_contact_plugin.appendChild(energy_node);
+            }
+        }
+
+        // Set initial conditions
+        Node cc3d_steppable_plugin = dom.getElementsByTagName("Region").item(0);
+        ArrayList<String> cell_distribution = new ArrayList<String>();
+        for (ModuleDefinition md : host_modules)
+            cell_distribution.add(md.getDisplayId());
+        Element types_node = dom.createElement("Types");
+        types_node.setTextContent(String.join(",", cell_distribution));
+        cc3d_steppable_plugin.appendChild(types_node);
+
+
+        // Serialize custom CC3D XML file
+        try {
+            Transformer tr = TransformerFactory.newInstance().newTransformer();
+            tr.setOutputProperty(OutputKeys.INDENT, "yes");
+            tr.setOutputProperty(
+                "{http://xml.apache.org/xslt}indent-amount",
+                Integer.toString(3));
+            tr.transform(new DOMSource(dom), new StreamResult(new FileOutputStream("./" + morphogen_id + "/Simulation/cellsorting.xml")));
+        } catch (TransformerException te) {
+            System.out.println(te.getMessage());
+        } catch (IOException ioe) {
+            System.out.println(ioe.getMessage());
+        }
+
+        return null;
+
+    }
+
+    private static String instance(String root) {
+        return root + "_INSTANCE";
+    }
+    private static Map<String, ModulePorts> ensureModule(String module, int params) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException, URISyntaxException, SynBioHubException {
+        switch (module) {
+        case HEKCHOSortedBall: return defineHEKCHOSortedBall(params);
+        default:
+            throw new CircuitBuilderException("Unknown module " + module);
+        }
+    }
+
+    private static ComponentDefinition ensureComponent(String module) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        switch (module) {
+        case HEK293_CELL: return defineHEK293_CELL();
+        case CHO_CELL: return defineCHO_CELL();
+        default:
+            throw new CircuitBuilderException("Unknown component " + module);
+        }
+    }
+
+    private static Map<String, ModulePorts> defineHEKCHOSortedBall(int params) throws SBOLValidationException, CircuitBuilderException, IOException, SBOLConversionException, URISyntaxException, SynBioHubException {
+        CircuitBuilder builder = CircuitBuilder.instance();
+
+        // Make the two cell classes
+        ModulePorts hek = builder.instantiateModule(new URI("https://bbn.com/HEK"));
+        ModulePorts cho = builder.instantiateModule(new URI("https://bbn.com/CHO"));
+
+        // sort them, this makes their FunctionalComponent instances and adds annotations
+        return Sorting.sortedBall(hek, cho, params); // hek is interior, cho is exterior for now
+    }
+
+    private static boolean checkParametersForSorting(int params) {
+        return params > 0;
+    }
+
+    private static ComponentDefinition defineHEK293_CELL() throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        SBOLDocument root = CircuitBuilder.instance().getDocument();
+        ComponentDefinition def = root.createComponentDefinition(instance(HEK293_CELL), URI.create("http://purl.obolibrary.org/obo/OBI_0100060"));
+        def.setName("HEK293");
+        return def;
+    }
+
+    private static ComponentDefinition defineCHO_CELL() throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        SBOLDocument root = CircuitBuilder.instance().getDocument();
+        ComponentDefinition def = root.createComponentDefinition(instance(CHO_CELL), URI.create("http://purl.obolibrary.org/obo/OBI_0100060"));
+        def.setName("CHO");
+        return def;
+    }
+
+    // sort the two Modules, this makes their FunctionalComponent instances if they don't exist and adds annotations
+    public static Map<String, ModulePorts> sortedBall(ModulePorts interior, ModulePorts exterior, int params) throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException, CircuitBuilderException, SynBioHubException {
+        if (!checkParametersForSorting(params)) {
+            throw new CircuitBuilderException("Invalid parameters supplied to sorting.");
+        }
+        CircuitBuilder builder = CircuitBuilder.instance();
+
+        // create functional component instances for interior and exterior if they don't exist
+        String interiorID = interior.getDefinition().getDisplayId();
+        String interiorFCID = interiorID + "_fc"; // assumes the fc = displayId_fc
+        log.info("looking for interior's fc using string: " + interiorFCID);
+        FunctionalComponent interiorFC = interior.getSystemInstance(interiorFCID);
+
+        String exteriorID = exterior.getDefinition().getDisplayId();
+        String exteriorFCID = exteriorID + "_fc"; // assumes the fc = displayId_fc
+        log.info("looking for exterior's fc using string: " + exteriorFCID);
+        FunctionalComponent exteriorFC = exterior.getSystemInstance(exteriorFCID);
+        
+        // Add interactions that are common to ALL sorting..  for now adhesion between two parties, and their self adhesion(s)
+        // interior-interior
+        Interaction iiInteraction = builder.createInteraction(interiorID + interiorID + "_Adhesion", SystemsBiologyOntology.NON_COVALENT_BINDING);
+        iiInteraction.createParticipation(interiorID + interiorID + "_Adhesion_" + interiorID, interiorFC.getDisplayId(), SystemsBiologyOntology.REACTANT);
+        // exterior-exterior
+        Interaction eeInteraction = builder.createInteraction(exteriorID + exteriorID + "_Adhesion", SystemsBiologyOntology.NON_COVALENT_BINDING);
+        eeInteraction.createParticipation(exteriorID + exteriorID + "_Adhesion_" + exteriorID, exteriorFC.getDisplayId(), SystemsBiologyOntology.REACTANT);
+        // interior-exterior
+        Interaction ieInteraction = builder.createInteraction(interiorID + exteriorID + "_Adhesion", SystemsBiologyOntology.NON_COVALENT_BINDING);
+        ieInteraction.createParticipation(interiorID + exteriorID + "_Adhesion_" + interiorID, interiorFC.getDisplayId(), SystemsBiologyOntology.REACTANT);
+        ieInteraction.createParticipation(interiorID + exteriorID + "_Adhesion_" + exteriorID, exteriorFC.getDisplayId(), SystemsBiologyOntology.REACTANT);
+
+        Map<String, ModulePorts> result = new HashMap<String, ModulePorts>();
+        result.put(INTERIOR, interior);
+        result.put(EXTERIOR, exterior);
+        return result;
+    }
+
+    public static Map<String, ModulePorts> sortedRegion(ModulePorts region, int params, FunctionalComponent promoter, FunctionalComponent cadherin) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException, URISyntaxException, SynBioHubException {
+        if (!checkParametersForSorting(params)) {
+            throw new CircuitBuilderException("Invalid parameters supplied to sorting the region.");
+        }
+        CircuitBuilder builder = CircuitBuilder.instance();
+
+        Map<String, ModulePorts> sortedCells = Sorting.sortedRegion(region, params);
+        ModulePorts switchPorts = sortedCells.get("SWITCH");
+        // previous switch's (output) promoter into this switch's generic_promoter_fc
+        builder.connect(promoter, switchPorts.getInput("generic_promoter_fc"));
+        // current switch's (output) hEF1A constitutive promoter into the cadherin's generic_promoter_fc
+        builder.connect(switchPorts.getOutput("hEF1a_fc"), cadherin);
+        // current switch's (output) UbC constitutive promoter connection is TBD
+
+        return sortedCells;
+    }
+
+
+    public static Map<String, ModulePorts> sortedRegion(ModulePorts region, int params) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException, URISyntaxException, SynBioHubException {
+        if (!checkParametersForSorting(params)) {
+            throw new CircuitBuilderException("Invalid parameters supplied to sorting the region.");
+        }
+        CircuitBuilder builder = CircuitBuilder.instance();
+
+        // create functional component instances for interior and exterior if they don't exist
+        String morphogenBaseURI = "http://bbn.com/ProtelisMorphogen/"; // todo brian, make public and get from CircuitBuilder
+        String regionID = region.getDefinition().getDisplayId();
+        String regionFCID = regionID + "_fc"; // assumes the fc = displayId_fc
+        FunctionalComponent regionFC = region.getSystemInstance(regionFCID);
+
+       /*
+        *   creating a sortedRegion will
+        *       1) create a new switch ModuleDefinition
+        *       2) instantiate switch Module in your experiment
+        *       3) install the switch into host region using container-contains-contained Interaction
+        *       4) instantiate recombinase Module (twice)
+        *       5) install the recombinase into host region using container-contains-contained Interaction (twice)
+        *       6) connect recombinase outputs<->switch inputs
+        *       7) instantiate regulation Module (twicE)
+        *       8) install the regulation into host region using container-contains-contained Interaction (twice)
+        *       9) connect regulation outputs<->recombinase inputs
+        *
+        */
+
+
+        // create a differentiation switch for this Module
+        String switchID = builder.instanceUID(regionID + "_switch");
+        ModuleDefinition switchDef = builder.createDifferentiationSwitch(switchID);
+
+        // add the switch module and install it into this Module
+        ModulePorts switchPorts = Sorting.addDifferentiationModulePorts(regionID, regionFC, switchDef);
+        log.info("switchPorts = " + switchPorts.toString());
+
+        // add the recombinase module and install it into this Module
+        URI r1BaseURI = new URI("https://bbn.com/r1");
+        String r1FCString = "PhiC31_fc";
+        ModulePorts r1 = Sorting.addRecombinaseModulePorts(regionID, regionFC, r1BaseURI, r1FCString);
+
+        // collect recombinase outputs
+        FunctionalComponent r1attB = r1.getOutput(new URI(r1BaseURI + "/PhiC31_attB_fc"));
+        FunctionalComponent r1attP = r1.getOutput(new URI(r1BaseURI + "/PhiC31_attP_fc"));
+
+        // get the recombinase input locations from switch
+        FunctionalComponent switchattB1 = switchPorts.getInput(new URI(morphogenBaseURI + switchID + "/attB_site1_fc"));
+        FunctionalComponent switchattP1 = switchPorts.getInput(new URI(morphogenBaseURI + switchID + "/attP_site1_fc"));
+
+        // connect recombinase->switch
+        builder.connect(r1attB, switchattB1);
+        builder.connect(r1attP, switchattP1);
+
+        // create the recombinase module and install it into this Module (twice)
+        URI r2BaseURI = new URI("https://bbn.com/r2");
+        String r2FCString = "WBeta_fc";
+        ModulePorts r2 = Sorting.addRecombinaseModulePorts(regionID, regionFC, r2BaseURI, r2FCString);
+
+        // collect recombinase outputs (twice)
+        FunctionalComponent r2attB = r2.getOutput(new URI(r2BaseURI + "/WBeta_attB_fc"));
+        FunctionalComponent r2attP = r2.getOutput(new URI(r2BaseURI + "/WBeta_attP_fc"));
+
+        // get the recombinase input locations from switch (twice)
+        FunctionalComponent switchattB2 = switchPorts.getInput(new URI(morphogenBaseURI + switchID + "/attB_site2_fc"));
+        FunctionalComponent switchattP2 = switchPorts.getInput(new URI(morphogenBaseURI + switchID + "/attP_site2_fc"));
+
+        // connect recombinase->switch (twice)
+        builder.connect(r2attB, switchattB2);
+        builder.connect(r2attP, switchattP2);
+        
+        // create the regulation module
+        URI reg1BaseURI = new URI("https://bbn.com/phEF1a_module");
+        String reg1FCString = "hEF1a_fc";
+        ModulePorts reg1 = Sorting.addRegulationModulePorts(regionID, regionFC, reg1BaseURI, reg1FCString);
+
+        // get the recombinase's input and connect
+        FunctionalComponent r1promoter = r1.getInput();
+        FunctionalComponent reg1output = reg1.getOutput();
+        builder.connect(reg1output, r1promoter);
+
+        // create the regulation module (twice)
+        URI reg2BaseURI = new URI("https://bbn.com/pUbC_module");
+        String reg2FCString = "UbC_fc";
+        ModulePorts reg2 = Sorting.addRegulationModulePorts(regionID, regionFC, reg2BaseURI, reg2FCString);
+
+        // get the recombinase's input and connect (twice)
+        FunctionalComponent r2promoter = r2.getInput();
+        FunctionalComponent reg2output = reg2.getOutput();
+        builder.connect(reg2output, r2promoter);
+
+        Map<String, ModulePorts> result = new HashMap<String, ModulePorts>();
+        result.put("REGION", region);
+        result.put("SWITCH", switchPorts);
+        result.put("RECOMBINASE1", r1);
+        result.put("RECOMBINASE2", r2);
+        result.put("REGULATION1", reg1);
+        result.put("REGULATION2", reg2);
+        return result;
+    }
+
+    // todo brian: consider moving these to CircuitBuilder 
+    private static ModulePorts addRegulationModulePorts(String regionID, FunctionalComponent regionFC, URI reg1BaseURI, String reg1FCString) throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException, CircuitBuilderException, SynBioHubException {
+        CircuitBuilder builder = CircuitBuilder.instance();
+        ModulePorts reg1 = builder.instantiateModule(reg1BaseURI);
+        String reg1ID = reg1.getDefinition().getDisplayId();
+        FunctionalComponent reg1FC = reg1.getSystemInstance(reg1FCString); // ideally we could use reg1ID + _fc, but ModuleDefinition name is not always the same
+        try {
+            Interaction regionContainsRegulation1 = builder.createInteraction(regionID + "Has" + reg1ID, SystemsBiologyOntology.CONTAINMENT);
+            regionContainsRegulation1.createParticipation(regionID + "Has" + reg1ID +  "_" + regionID, regionFC.getDisplayId(), SystemsBiologyOntology.FUNCTIONAL_COMPARTMENT); // SBO:0000289 functional compartment
+            regionContainsRegulation1.createParticipation(regionID + "Has" + reg1ID +  "_" + reg1ID, reg1FC.getDisplayId(), new URI("http://identifiers.org/biomodels.sbo/SBO:0000664")); // SBO:0000664 contained entity
+        } catch (SBOLValidationException sve) {
+            // TODO revisit this, should we instanceUID the interaction?  Seems redundant if we're just specifying the region has recombinase
+            log.info("SBOLValidationException during Interaction creation, likely a duplicate entry, ignoring for now: " + sve.getMessage());
+        }            
+		return reg1;
+    }
+
+    private static ModulePorts addRecombinaseModulePorts(String regionID, FunctionalComponent regionFC, URI r1BaseURI, String r1FCString) throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException, CircuitBuilderException, SynBioHubException {
+        CircuitBuilder builder = CircuitBuilder.instance();
+        ModulePorts r1 = builder.instantiateModule(r1BaseURI);
+        String r1ID = r1.getDefinition().getDisplayId();
+        FunctionalComponent r1FC = r1.getSystemInstance(r1FCString);
+        try {
+	        Interaction regionContainsRecombinase1 = builder.createInteraction(regionID + "Has" + r1ID, SystemsBiologyOntology.CONTAINMENT);
+	        regionContainsRecombinase1.createParticipation(regionID + "Has" + r1ID +  "_" + regionID, regionFC.getDisplayId(), SystemsBiologyOntology.FUNCTIONAL_COMPARTMENT); // SBO:0000289 functional compartment
+	        regionContainsRecombinase1.createParticipation(regionID + "Has" + r1ID +  "_" + r1ID, r1FC.getDisplayId(), new URI("http://identifiers.org/biomodels.sbo/SBO:0000664")); // SBO:0000664 contained entity
+        } catch (SBOLValidationException sve) {
+        	// TODO revisit this, should we instanceUID the interaction?  Seems redundant if we're just specifying the region has recombinase
+        	log.info("SBOLValidationException during Interaction creation, likely a duplicate entry, ignoring for now: " + sve.getMessage());
+        }
+        return r1;
+    }
+
+    private static ModulePorts addDifferentiationModulePorts(String regionID, FunctionalComponent regionFC, ModuleDefinition switchDef) throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException, CircuitBuilderException, SynBioHubException {
+        CircuitBuilder builder = CircuitBuilder.instance();
+        ModulePorts switchPorts = builder.instantiateModule(switchDef);
+        FunctionalComponent switchFC = switchPorts.getSystemInstance(switchPorts.getDefinition().getDisplayId() + "_fc");
+
+        // install switch into region
+        String switchID = switchDef.getDisplayId();
+        Interaction regionContainsSwitch = builder.createInteraction(regionID + "Has" + switchID, SystemsBiologyOntology.CONTAINMENT);
+        regionContainsSwitch.createParticipation(regionID + "Has" + switchID + "_" + regionID, regionFC.getDisplayId(), SystemsBiologyOntology.FUNCTIONAL_COMPARTMENT); // SBO:0000289 functional compartment
+        regionContainsSwitch.createParticipation(regionID + "Has" + switchID + "_" + switchID, switchFC.getDisplayId(), new URI("http://identifiers.org/biomodels.sbo/SBO:0000664")); // SBO:0000664 contained entity
+        return switchPorts;
+    }
+
+    // public static Map<String, ModulePorts>
+}

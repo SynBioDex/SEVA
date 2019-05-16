@@ -1,0 +1,208 @@
+package com.bbn.FACETS;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.logging.Logger;
+
+import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.ModuleDefinition;
+import org.sbolstandard.core2.SBOLConversionException;
+import org.sbolstandard.core2.SBOLDocument;
+import org.sbolstandard.core2.SBOLValidationException;
+import org.sbolstandard.core2.TopLevel;
+import org.synbiohub.frontend.SynBioHubException;
+import org.synbiohub.frontend.SynBioHubFrontend;
+
+/**
+ * Helper class for importing SBOL into the working compilation.
+ */
+public final class DefinitionImporter {
+    private static Logger log = Logger.getGlobal();
+    private DefinitionImporter() { } // Static-only class
+    
+    private static boolean disableCache = false;
+    private static SynBioHubFrontend repository = null;
+    
+    /** Boot up link with main SynBioHub repository, if possible */
+    private static void ensureSynBioHubConnection() {
+        if(repository != null) return;
+        
+        try {
+            SynBioHubFrontend sbh = new SynBioHubFrontend("https://synbiohub.org");
+            // TODO: fix this to a group when available: jakebeal@gmail.com is the FACETS account email for now
+            sbh.login("jakebeal@gmail.com", "facets");
+            repository = sbh;
+        } catch (Exception e) {
+            log.warning("Could not log into SynBioHub");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Attempt to return a document from a local cache, rather than having to go to SynBioHub
+     * @param id URI of document 
+     * @return cached document, or null if none exists
+     */
+    private static SBOLDocument retrieveFromCache(final URI id) {
+        if (disableCache) { 
+            return null; // go straight back if caching is disabled
+        } 
+
+        // Compute document location
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        String path = id.getPath();
+        File file = new File(tmpDir + "/" + path); // TODO: make sure this works on Windows
+        log.info("Attempting to retrieve SBOL definition " + id + " from cache: " + file);
+
+        // Attempt to read the document
+        SBOLDocument cached = new SBOLDocument();
+        try {
+            cached.read(file);
+        } catch (Exception e) {
+            log.info("No cached version available for " + id);
+            return null; // no document available
+        }
+        return cached;
+    }
+
+    /**
+     * Store a document into the local cache keyed to a specific part URI (it will likely contain other parts as well).
+     * @param id URI document is keyed on 
+     * @param documentToCache Document to be written
+     * @throws IOException
+     * @throws SBOLConversionException
+     */
+    protected static void storeInCache(final URI id, final SBOLDocument documentToCache) throws IOException, SBOLConversionException {
+        // Compute document location
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        String path = id.getPath();
+        File file = new File(tmpDir + "/" + path);
+        // Attempt to write the document
+        log.info("Caching " + id + " to " + file);
+
+        if (file.getParentFile() != null) {
+        	file.getParentFile().mkdirs();
+            documentToCache.write(file);
+        }
+        else
+            documentToCache.write(file);
+    }
+
+    /**
+     * Store a keyed document into the local cache for every ModuleDefinition in the documentToCache
+     * @param documentToCache Document to be written
+     * @throws IOException
+     * @throws SBOLConversionException
+     */
+    protected static void storeInCache(final SBOLDocument documentToCache) throws IOException, SBOLConversionException {
+        // Compute document location
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        for (ModuleDefinition md : documentToCache.getModuleDefinitions()) {
+        	storeInCache(md.getIdentity(), documentToCache);
+        }
+        for (ComponentDefinition cd : documentToCache.getComponentDefinitions()) {
+        	storeInCache(md.getIdentity(), documentToCache);
+        }
+    }
+    
+    /**
+     * Get a ModuleDefinition from either SynBioHub or local cache, then copy it into the working document.
+     * @param target Working document to import into
+     * @param id URI of module definition
+     * @return desired module definition
+     * @throws SynBioHubException when retrieval fails
+     * @throws CircuitBuilderException when id maps to something other than a ModuleDefinition
+     * @throws SBOLValidationException if import into working document fails
+     */
+    protected static ModuleDefinition importModuleDefinition(final SBOLDocument target, final URI id) throws SynBioHubException, CircuitBuilderException, SBOLValidationException  {
+        // Try cache first; if it fails, go for SynBioHub instead
+
+    	SBOLDocument imported = retrieveFromCache(id);
+        if (imported == null) {
+            ensureSynBioHubConnection();
+            log.info("Retrieving SBOL definition from SynBioHub: " + id);
+            try {
+            	imported = repository.getSBOL(id);
+            } catch (SynBioHubException e) {
+            	log.info("Import failed. ModuleDefinition " + id + " not found");
+            	throw new CircuitBuilderException("");
+            }
+
+            // Cache the file locally for faster future retrieval
+            try {
+                storeInCache(id, imported);
+            } catch (IOException | SBOLConversionException e) {
+                log.warning("Could not cache " + id);
+            }
+        }
+
+        // Make sure that what we got was actually a module definition
+        TopLevel md = imported.getTopLevel(id);
+        if (!(md instanceof ModuleDefinition)) {
+            throw new CircuitBuilderException("Expected ModuleDefinition for " + id + ", but got " + md);
+        }
+        // Copy the definition and all dependencies that were sent along with it
+        for (TopLevel tl : imported.getTopLevels()) {
+            if (target.getTopLevel(tl.getIdentity()) == null) {
+                target.createCopy(tl); // only copy things that aren't already imported
+            }
+        }
+        return target.getModuleDefinition(id);
+    }
+
+    /**
+     * Get a ComponentDefinition from either SynBioHub or local cache, then copy it into the working document.
+     * @param target Working document to import into
+     * @param id URI of module definition
+     * @return desired module definition
+     * @throws SynBioHubException when retrieval fails
+     * @throws CircuitBuilderException when id maps to something other than a ModuleDefinition
+     * @throws SBOLValidationException if import into working document fails
+     * TODO refactor importModuleDefinition and importComponentDefinition so that they aren't redundant
+     */
+    protected static ComponentDefinition importComponentDefinition(final SBOLDocument target, final URI id) throws SynBioHubException, CircuitBuilderException, SBOLValidationException  {
+        // Try cache first; if it fails, go for SynBioHub instead
+
+    	SBOLDocument imported = retrieveFromCache(id);
+        if (imported == null) {
+            ensureSynBioHubConnection();
+            log.info("Retrieving SBOL definition from SynBioHub: " + id);
+            try {
+            	imported = repository.getSBOL(id);
+            } catch (SynBioHubException e) {
+            	log.info("Import failed. ModuleDefinition " + id + " not found");
+            	throw new CircuitBuilderException("");
+            }
+
+            // Cache the file locally for faster future retrieval
+            try {
+                storeInCache(id, imported);
+            } catch (IOException | SBOLConversionException e) {
+                log.warning("Could not cache " + id);
+            }
+        }
+
+        // Make sure that what we got was actually a module definition
+        TopLevel cd = imported.getTopLevel(id);
+        if (!(cd instanceof ComponentDefinition)) {
+            throw new CircuitBuilderException("Expected ComponentDefinition for " + id + ", but got " + cd);
+        }
+        // Copy the definition and all dependencies that were sent along with it
+        for (TopLevel tl : imported.getTopLevels()) {
+            if (target.getTopLevel(tl.getIdentity()) == null) {
+                target.createCopy(tl); // only copy things that aren't already imported
+            }
+        }
+        return target.getComponentDefinition(id);
+    }
+    
+    
+    
+    
+    
+    /** Force reload of everything from SynBioHub. */
+    public static void disableCache() { 
+        disableCache = true;
+    }
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;TestCircuitBuilder.java&apos; to &apos;com.bbn.FACETS.TestCircuitBuilder.java&apos;&#x0A;- Original project: &apos;morphogen-interpreter&apos;&#x0A;- Destination element: &apos;com.bbn.FACETS.TestCircuitBuilder.java&apos;&#x0A;- Original element: &apos;com.bbn.FACETS.TestCircuitBuilder.java&apos;" description="Copy compilation unit" destination="/src\/test\/java&lt;com.bbn.FACETS{TestCircuitBuilder.java" element1="/src\/test\/java&lt;com.bbn.FACETS{TestCircuitBuilder.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1531220531732" units="1" version="1.0"/>
+</session>

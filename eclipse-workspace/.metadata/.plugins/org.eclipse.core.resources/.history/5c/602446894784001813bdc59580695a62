@@ -1,0 +1,158 @@
+package com.bbn.FACETS;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.sbolstandard.core2.AccessType;
+import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.DirectionType;
+import org.sbolstandard.core2.FunctionalComponent;
+import org.sbolstandard.core2.Interaction;
+import org.sbolstandard.core2.ModuleDefinition;
+import org.sbolstandard.core2.SBOLConversionException;
+import org.sbolstandard.core2.SBOLDocument;
+import org.sbolstandard.core2.SBOLValidationException;
+import org.sbolstandard.core2.SystemsBiologyOntology;
+
+public class Sorting {
+    /*** CONSTANTS ***/
+    private static final double HEK_CELL_DIAMETER = 1.0e-5;
+    /*** MODULE COLLECTION ***/
+    private static final String HEKCHOSortedBall = "HEKCHOSortedBall";
+    /*** COMPONENT COLLECTION ***/
+    private static final String CHO_CELL = "CHO_CELL";
+    private static final String HEK293_CELL = "HEK293_CELL";
+
+    /**
+     * Create a sorted ball out of HEK and CHO cells.
+     * The "ball" is only about 0.3x as high as it is wide
+     * @param diameter number of meters in diameter
+     * @param fraction Fraction HEK: must be at least 0.75
+     * @return Ports identifying HEK and CHO as the outputs
+     */
+    private static final double HEK_BALL_ASPECT_RATIO = 0.3;
+    public static ModulePorts HEKCHOSortedBall(double diameter, double fraction) throws SBOLValidationException, CircuitBuilderException, IOException, SBOLConversionException, URISyntaxException {
+        if(fraction < 0.75) {
+            throw new CircuitBuilderException("HEK fraction "+fraction+" is not enough to ensure a coherent interior");
+        }
+
+        System.out.println("trying to make HEKCHOSortedBall");
+        ensureModule(HEKCHOSortedBall);
+        System.out.println("made HEKCHOSortedBall");
+        // Create basic instance
+        ModulePorts ports = CircuitBuilder.instance().instantiateModule(HEKCHOSortedBall);
+        // Ellipsoid volume: 4/3 pi ABC --> 4/3 pi 0.3 diam^3
+        double ballVolume = 4.0 / 3.0 * Math.PI * HEK_BALL_ASPECT_RATIO * Math.pow(diameter / 2, 3);
+        double cellVolume = 4.0 / 3.0 * Math.PI * Math.pow(HEK_CELL_DIAMETER / 2, 3);
+        double cells = ballVolume / cellVolume;
+        // Compute and apply 
+        double hekCount = Math.round(cells * fraction);
+        double choCount = Math.round(cells * (1 - fraction));
+        
+        if(cells < 100 || cells > 1e5) {
+            throw new CircuitBuilderException("Require number of cells  "+cells+" is out of predicted functional range");
+        }
+
+        FunctionalComponent cho = ports.getSystemInstance(instance(CHO_CELL));
+        System.out.println(cho.getDisplayId() + "\t" + cho.getDefinitionURI().toString());
+
+        System.out.println("adding dosage: "+CircuitBuilder.DOSAGE.getNamespaceURI());
+        cho.createAnnotation(CircuitBuilder.DOSAGE, choCount);
+        FunctionalComponent hek = ports.getSystemInstance(instance(HEK293_CELL));
+        System.out.println(hek.getDisplayId() + "\t" + hek.getDefinitionURI().toString());
+
+        hek.createAnnotation(CircuitBuilder.DOSAGE, hekCount);
+        return ports;
+    }
+    
+    public static ModulePorts twoCHOSortedBall(double diameter, double fraction) {
+        throw new RuntimeException("twoCHOSortedBall is not yet implemented");
+    }
+    
+    public static ModulePorts speckleRegion(double speckleDiameter, Integer clusters) {
+//        if(fraction < 0.75) {
+//            throw new CircuitBuilderException("HEK fraction "+fraction+" is not enough to ensure a coherent interior");
+//        }
+//
+//        System.out.println("trying to make HEKCHOSortedBall");
+//        ensureModule(HEKCHOSortedBall);
+//        System.out.println("made HEKCHOSortedBall");
+//        // Create basic instance
+//        ModulePorts ports = CircuitBuilder.instance().instantiateModule(HEKCHOSortedBall);
+//        // Ellipsoid volume: 4/3 pi ABC --> 4/3 pi 0.3 diam^3
+//        double ballVolume = 4.0 / 3.0 * Math.PI * HEK_BALL_ASPECT_RATIO * Math.pow(diameter / 2, 3);
+//        double cellVolume = 4.0 / 3.0 * Math.PI * Math.pow(HEK_CELL_DIAMETER / 2, 3);
+//        double cells = ballVolume / cellVolume;
+//        // Compute and apply 
+//        double hekCount = Math.round(cells * fraction);
+//        double choCount = Math.round(cells * (1 - fraction));
+//        
+//        if(cells < 100 || cells > 1e5) {
+//            throw new CircuitBuilderException("Require number of cells  "+cells+" is out of predicted functional range");
+//        }
+//
+//        FunctionalComponent cho1 = ports.getSystemInstance(instance(CHO_CELL));
+//
+//        System.out.println("adding dosage: "+CircuitBuilder.DOSAGE.getNamespaceURI());
+//        cho1.createAnnotation(CircuitBuilder.DOSAGE, choCount);
+//        FunctionalComponent cho2 = ports.getSystemInstance(instance(CHO_CELL));
+//        cho2.createAnnotation(CircuitBuilder.DOSAGE, hekCount);
+//        return ports;  
+    		return null;
+    	}
+    
+    private static String instance(String root) {
+        return root+"_INSTANCE";
+    }
+    private static ModuleDefinition ensureModule(String module) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        switch(module) {
+        case HEKCHOSortedBall: return defineHEKCHOSortedBall();
+        default:
+            throw new CircuitBuilderException("Unknown module "+module);
+        }
+    }
+    
+    private static ComponentDefinition ensureComponent(String module) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        switch(module) {
+        case HEK293_CELL: return defineHEK293_CELL();
+        case CHO_CELL: return defineCHO_CELL();
+        default:
+            throw new CircuitBuilderException("Unknown component "+module);
+        }
+    }
+    
+    private static ModuleDefinition defineHEKCHOSortedBall() throws SBOLValidationException, CircuitBuilderException, IOException, SBOLConversionException, URISyntaxException {
+        SBOLDocument root = CircuitBuilder.instance().getDocument();
+        ModuleDefinition def = root.createModuleDefinition(HEKCHOSortedBall);
+        // Make the two cell classes
+        ensureComponent(HEK293_CELL);
+        FunctionalComponent hek = def.createFunctionalComponent(HEK293_CELL+"_INSTANCE", AccessType.PUBLIC, HEK293_CELL, DirectionType.OUT);
+        ensureComponent(CHO_CELL);
+        FunctionalComponent cho = def.createFunctionalComponent(CHO_CELL+"_INSTANCE", AccessType.PUBLIC, CHO_CELL, DirectionType.OUT);
+        // Add adhesion interactions
+        Interaction aCC = def.createInteraction("CHOCHO_Adhesion", SystemsBiologyOntology.NON_COVALENT_BINDING);
+        aCC.createParticipation("CHOCHO_Adhesion_CHO", cho.getDisplayId(), SystemsBiologyOntology.REACTANT);
+        Interaction aHH = def.createInteraction("HEKHEK_Adhesion", SystemsBiologyOntology.NON_COVALENT_BINDING);
+        aCC.createParticipation("HEKHEK_Adhesion_HEK", hek.getDisplayId(), SystemsBiologyOntology.REACTANT);
+        Interaction aHC = def.createInteraction("HEKCHO_Adhesion", SystemsBiologyOntology.NON_COVALENT_BINDING);
+        aCC.createParticipation("HEKCHO_Adhesion_HEK", hek.getDisplayId(), SystemsBiologyOntology.REACTANT);
+        aCC.createParticipation("HEKCHO_Adhesion_CHO", cho.getDisplayId(), SystemsBiologyOntology.REACTANT);
+        // return the finished definition
+        return def;
+    }
+    
+    private static ComponentDefinition defineHEK293_CELL() throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        SBOLDocument root = CircuitBuilder.instance().getDocument();
+        ComponentDefinition def = root.createComponentDefinition(HEK293_CELL, URI.create("http://purl.obolibrary.org/obo/OBI_0100060"));
+        def.setName("HEK293");
+        return def;
+    }
+    
+    private static ComponentDefinition defineCHO_CELL() throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        SBOLDocument root = CircuitBuilder.instance().getDocument();
+        ComponentDefinition def = root.createComponentDefinition(CHO_CELL, URI.create("http://purl.obolibrary.org/obo/OBI_0100060"));
+        def.setName("CHO");
+        return def;
+    }
+}

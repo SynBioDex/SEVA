@@ -1,0 +1,943 @@
+package com.bbn.FACETS;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.UUID;
+import java.util.logging.Logger;
+
+import javax.xml.namespace.QName;
+
+import org.sbolstandard.core2.AccessType;
+import org.sbolstandard.core2.Annotation;
+import org.sbolstandard.core2.Collection;
+import org.sbolstandard.core2.Component;
+import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.DirectionType;
+import org.sbolstandard.core2.FunctionalComponent;
+import org.sbolstandard.core2.Interaction;
+import org.sbolstandard.core2.MapsTo;
+import org.sbolstandard.core2.Module;
+import org.sbolstandard.core2.ModuleDefinition;
+import org.sbolstandard.core2.RefinementType;
+import org.sbolstandard.core2.RestrictionType;
+import org.sbolstandard.core2.SBOLConversionException;
+import org.sbolstandard.core2.SBOLDocument;
+import org.sbolstandard.core2.SBOLReader;
+import org.sbolstandard.core2.SBOLValidate;
+import org.sbolstandard.core2.SBOLValidationException;
+import org.sbolstandard.core2.Sequence;
+import org.sbolstandard.core2.SequenceConstraint;
+import org.sbolstandard.core2.SequenceOntology;
+import org.synbiohub.frontend.SynBioHubException;
+
+import java8.util.function.Function;
+
+/**
+ * This is the "master" class of Protelis-Morphogen, which is used for
+ * constructing a genetic design from an evaluation of a Protelis program.
+ */
+public final class CircuitBuilder {
+    private static Logger log = Logger.getGlobal();
+
+    /*** TERMS ***/
+    public static final QName DOSAGE = new QName("http://bbn.com/FACETS/", "dosage", "facets");
+    public static final QName STRUCTURE_PROPERTY = new QName("http://bbn.com/FACETS/", "structure", "facets");
+
+    private static final String DEFAULT_PREFIX = "http://bbn.com/ProtelisMorphogen/";
+    private static final String FACETS_COLLECTION_NAME = "GeneratedDesign";
+    private static final String DEFAULT_MODULE_NAME = "FACETS_SYSTEM";
+
+    private static CircuitBuilder instance = null;
+    private static  SBOLDocument partShop = new SBOLDocument();  // Contains a kit of ModuleDefinitions with which to build circuits
+
+    private final String CIRCUIT_NAME;
+    private final SBOLDocument ROOT = new SBOLDocument(); // SBOL Document containing SYSTEM and all dependencies
+    private final ModuleDefinition SYSTEM; // evolving module definition for the generated SYSTEM
+    private final ComponentDefinition STRUCTURE; // a structural representation of SYSTEM
+
+    private int counter = 0; // UID for elements in the SYSTEM
+
+    // Custom URIs for ModuleDefinitions
+    static String defaultNamespace = "https://bbn.com";
+    private static final String EXPRESSION_MODULE = defaultNamespace + "/expression";
+    private static final String CONSTITUTIVE_MODULE = defaultNamespace + "/constitutive";
+    private static final String REGULATION_MODULE = defaultNamespace + "/regulation";
+    private static final String RECOMBINATION_MODULE = defaultNamespace + "/recombination";
+    private static final String DIFFERENTIATION_MODULE = defaultNamespace + "/differentiation";
+    private static final String HOST_MODULE = defaultNamespace + "/host";
+    private static final String MEDIUM_MODULE = "http://purl.obolibrary.org/obo/OBI_0000079";
+
+    /**
+     * Initialize a blank SBOL document to put the generated SYSTEM into
+     * @param prefix Stem for this document name
+     * @param moduleName
+     * @throws SBOLValidationException
+     * @throws SBOLConversionException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    private CircuitBuilder(final String prefix, final String circuit_name) throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+//        ROOT = new SBOLDocument();
+        ROOT.setDefaultURIprefix(DEFAULT_PREFIX);
+        // Start with an empty document: libraries will be imported as needed
+        SYSTEM = ROOT.createModuleDefinition(circuit_name);
+        CIRCUIT_NAME = circuit_name;
+        STRUCTURE = ROOT.createComponentDefinition(circuit_name + "_structure", ComponentDefinition.DNA);
+        STRUCTURE.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000001"));
+        SYSTEM.createAnnotation(STRUCTURE_PROPERTY, STRUCTURE.getIdentity());
+
+        // Add the SYSTEM to the named master collection, so that it can be readily extracted
+        Collection c = ROOT.createCollection(FACETS_COLLECTION_NAME);
+        c.addMember(SYSTEM.getIdentity());
+        instance = this;
+    }
+
+    private void generateModel(Object o)
+    {
+    	System.out.println("Executing callback");
+    }
+    
+    public CircuitBuilder(final String circuit_name) throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        this(DEFAULT_PREFIX, circuit_name);
+    }
+    
+    /** @return a new UID for an instance with the given stem. */
+    protected String instanceUID(final String stem) {
+        log.info("instanceUID called, this.CIRCUIT_NAME = " + this.CIRCUIT_NAME + ", counter = " + counter);
+        return stem + "_" + (counter++);
+    }
+
+    /**
+     * Get the current circuit-building instance, which can then be used for stitching together modules.
+     * @return Current CircuitBuilder instance
+     * @throws SBOLValidationException if something goes wrong during initialization
+     * @throws SBOLConversionException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static CircuitBuilder instance() throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        if (instance == null) {
+            initializeCircuitBuilder();
+        }
+        return instance;
+    }
+
+    public static boolean isInitialized() {
+        return !(instance == null);
+    }
+
+    /**
+     * Create (or reboot) a circuit builder instance with default naming.
+     * TODO: consider whether we ever want/need to allow non-default naming
+     * @throws SBOLValidationException if something goes wrong during initialization
+     * @throws SBOLConversionException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void initializeCircuitBuilder() throws SBOLValidationException, IOException, SBOLConversionException, URISyntaxException {
+        String prefix = DEFAULT_PREFIX + "session_" + UUID.randomUUID() + "/";
+        instance = new CircuitBuilder(prefix, DEFAULT_MODULE_NAME);
+    }
+
+    public Interaction createInteraction(String displayId, URI role) throws SBOLValidationException {
+        return SYSTEM.createInteraction(displayId, role);
+    }
+
+    ModuleDefinition createModuleDefinition(String displayId, ComponentDefinition[] components) throws SBOLValidationException, URISyntaxException, SynBioHubException, CircuitBuilderException {
+        ComponentDefinition[] imported_components = new ComponentDefinition[components.length];
+
+        for (Integer i_cd = 0; i_cd < imported_components.length; ++i_cd) {
+            ComponentDefinition component = components[i_cd];
+            imported_components[i_cd] = DefinitionImporter.importComponentDefinition(ROOT, component.getIdentity());
+        }
+        ModuleDefinition mdef = ROOT.createModuleDefinition(displayId);
+        ComponentDefinition cdef = ROOT.createComponentDefinition(displayId + "_structure", ComponentDefinition.DNA);
+        cdef.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000001"));
+        mdef.createAnnotation(STRUCTURE_PROPERTY, cdef.getIdentity());
+
+        for (ComponentDefinition component : imported_components) {
+            if (component.getRoles().iterator().next().equals(SequenceOntology.CDS)) {
+                FunctionalComponent output_fc = mdef.createFunctionalComponent(component.getDisplayId() + "_fc", AccessType.PUBLIC, component.getIdentity(), DirectionType.OUT);
+                Component output_c = cdef.createComponent(component.getDisplayId()  + "_c", AccessType.PUBLIC, component.getIdentity());
+                output_fc.createAnnotation(STRUCTURE_PROPERTY, output_c.getIdentity());
+            } else if ( component.getRoles().iterator().next().equals(SequenceOntology.PROMOTER)
+                        && component.getIdentity().equals(new URI("https://bbn.com/generic_promoter"))) {
+                FunctionalComponent input_fc = mdef.createFunctionalComponent(component.getDisplayId() + "_fc", AccessType.PUBLIC, component.getIdentity(), DirectionType.IN);
+                Component input_c = cdef.createComponent(component.getDisplayId()  + "_c", AccessType.PUBLIC, component.getIdentity());
+                input_fc.createAnnotation(STRUCTURE_PROPERTY, input_c.getIdentity());                
+            } else if (component.getRoles().iterator().next().equals(SequenceOntology.PROMOTER)) {
+                FunctionalComponent input_fc = mdef.createFunctionalComponent(component.getDisplayId() + "_fc", AccessType.PUBLIC, component.getIdentity(), DirectionType.OUT);
+                Component input_c = cdef.createComponent(component.getDisplayId()  + "_c", AccessType.PUBLIC, component.getIdentity());
+                input_fc.createAnnotation(STRUCTURE_PROPERTY, input_c.getIdentity());
+
+            } else {
+                FunctionalComponent component_fc = mdef.createFunctionalComponent(component.getDisplayId() + "_fc", AccessType.PUBLIC, component.getIdentity(), DirectionType.NONE);
+                Component component_c = cdef.createComponent(component.getDisplayId()  + "_c", AccessType.PUBLIC, component.getIdentity());
+                component_fc.createAnnotation(STRUCTURE_PROPERTY, component_c.getIdentity());
+            }
+        }
+
+        // Hierarchically assemble submodule into SYSTEM
+        assemble(SYSTEM, new ModuleDefinition[] {mdef});
+        return mdef;
+    }
+
+    /**
+     * Create a Module instantiating the specified ModuleDefinition, importing if necessary.
+     * Return a map of its ports.
+     * @param id URI of ModuleDefinition to be instantiated
+     * @return Collection of ports associated with the module
+     * @throws SBOLValidationException when import or instantiation fails
+     * @throws CircuitBuilderException When ID does not map to a ModuleDefinition
+     * @throws SynBioHubException  When loading fails
+     * @throws SBOLConversionException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public ModulePorts instantiateModule(final URI id) throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+        ModuleDefinition mdef = ROOT.getModuleDefinition(id);
+        log.info("Root has " + ROOT.getModuleDefinitions().size() + " ModuleDefinitions before an import.");
+        // If the module isn't already part of this circuit, try to load it from the parts cache
+        log.info("Instantiating " + id);
+        if (mdef == null)
+            try {
+                log.info("Using DefinitionImporter.importModuleDefinition('" + ROOT + "', '" + id + "').");
+                mdef = DefinitionImporter.importModuleDefinition(ROOT, id);
+            } catch (CircuitBuilderException e) {
+                throw new CircuitBuilderException("Failed to instantiate \" + id + \". The ModuleDefinition was not found in the cache.");
+            }
+        log.info("Successfully imported " + id);
+        log.info("Root has " + ROOT.getModuleDefinitions().size() + " ModuleDefinitions after an import.");
+        return instantiateModule(mdef);
+    }
+
+    public ModulePorts instantiateModule(ModuleDefinition mdef) throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+        // gather the Components and add them to this STRUCTURE
+        instantiateStructure(mdef);
+        // Create the new module instance and scrape its ports
+        Module submodule = null;
+
+
+        for (Module m : SYSTEM.getModules()) {
+            log.info("Searching SYSTEM's module " + m.getDefinition().getDisplayId() + " to see if it equals mdef of interest: " + mdef.getDisplayId());
+            if (m.getDefinition() == mdef) {
+                log.info("Found a Module that points at the target ModuleDefinition, using this one.");
+                if (submodule != null)
+                    throw new CircuitBuilderException("Cannot expose ModulePorts for " + mdef.getIdentity() + ". The URI defines multiple submodules");
+                else
+                    submodule = m;
+            } else
+                log.info("No match.");
+        }
+
+        if (submodule == null) {
+            log.info("module for specified URI is not found in the ROOT SBOLDocument, creating one now.");
+            submodule = SYSTEM.createModule(instanceUID(mdef.getDisplayId()), mdef.getIdentity());
+            log.info("sending submodule to ModulePorts constructor: " + submodule.toString());
+        }
+        return new ModulePorts (SYSTEM, mdef, submodule);
+    }
+
+    public ComponentDefinition getComponentDefinition(final URI id) throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+        ComponentDefinition cdef = ROOT.getComponentDefinition(id);
+        log.info("Root has " + ROOT.getComponentDefinitions().size() + " ComponentDefinitions before an import.");
+        // If the module isn't already part of this circuit, try to load it from the parts cache
+        log.info("Instantiating " + id);
+        if (cdef == null)
+            try {
+                log.info("Using DefinitionImporter.importComponentDefinition('" + ROOT + "', '" + id + "').");
+                cdef = DefinitionImporter.importComponentDefinition(ROOT, id);
+            } catch (CircuitBuilderException e) {
+                throw new CircuitBuilderException("Failed to instantiate \" + id + \". The ComponentDefinition was not found in the cache.");
+            }
+        log.info("Successfully imported " + id);
+        log.info("Root has " + ROOT.getModuleDefinitions().size() + " ComponentDefinitions after an import.");
+        return cdef;
+    }
+
+    public void instantiateStructure(final URI id) throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+        // Get the correlated structural representation for a ModuleDefinition, assuming it exists
+        ModuleDefinition md = ROOT.getModuleDefinition(id);
+        instantiateStructure(md);
+    }
+
+    public void instantiateStructure(ModuleDefinition mdef) throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+        if (mdef == null)
+            throw new CircuitBuilderException("Unable to instanatiateStructure on a null ModuleDefinition.");
+
+        Annotation structure_id = mdef.getAnnotation(STRUCTURE_PROPERTY);
+        if (structure_id == null) {
+            log.info("ModuleDefinition " + mdef.getIdentity() + " has no structural representation");
+            return;
+        }
+        ComponentDefinition cd = ROOT.getComponentDefinition(structure_id.getURIValue());
+
+        // If the ComponentDefinition isn't already part of this circuit, try to load it from the parts cache
+        if (cd == null)
+            cd = DefinitionImporter.importComponentDefinition(ROOT, structure_id.getURIValue());
+        if (cd == null)
+            throw new CircuitBuilderException("Failed to instantiate structural layer for ModuleDefinition " + mdef.getIdentity());
+
+        // make sure that the component hasn't already been added to the STRUCTURE
+        for (Component c : STRUCTURE.getComponents()) {
+            if (c.getDefinition() == cd) {
+                log.info("A Component instance for ComponentDefinition " + cd + " already exists in STRUCTURE.  Skipping.");
+                return;
+            }
+        }
+        Component c = STRUCTURE.createComponent(instanceUID(mdef.getDisplayId()), AccessType.PUBLIC, cd.getIdentity());
+        log.info("Created component: " + c.toString());
+        return;
+    }
+
+    @Deprecated // need to remove this from Sorting.java
+    public ModulePorts instantiateModule(String id) throws SBOLValidationException, CircuitBuilderException, IOException, SBOLConversionException, URISyntaxException {
+        // TODO: name can't be hardwired
+        Module m = SYSTEM.createModule(instanceUID(id), id);
+        return null;
+//        return new ModulePorts(m, SYSTEM);
+    }
+
+    public ModuleDefinition importModule(final URI id) throws SBOLValidationException, CircuitBuilderException, SynBioHubException, IOException, SBOLConversionException, URISyntaxException {
+        ModuleDefinition mdef = ROOT.getModuleDefinition(id);
+
+        // If the module isn't already part of this circuit, try to load it from the parts cache
+        log.info("Instantiating " + id);
+        if (mdef == null)
+            try {
+                mdef = DefinitionImporter.importModuleDefinition(ROOT, id);
+            } catch (CircuitBuilderException e) {
+                throw new CircuitBuilderException("Failed to instantiate \" + id + \". The ModuleDefinition was not found in the cache.");
+            }
+        log.info("Successfully imported " + id);
+        return mdef;
+    }
+
+    public void connectOutputToInput(FunctionalComponent input, FunctionalComponent output) {
+//        input.createMapsTo(instanceUID("MapsTo"), refinement, local, remote)
+//        if(SYSTEM.getFunctionalComponent(input.getIdentity()) == null) {
+//            throw new CircuitBuilderException("");
+//        } else if(SYSTEM.getFunctionalComponent(output.getIdentity()) != null) {
+//            throw new CircuitBuilderException("When connecting output to input, output must not be in a modul");
+//        }
+        // TODO: figure out how to flatten into an appropriate definition
+    }
+
+//  public static void assemble(ModuleDefinition mdef, ModuleDefinition[] submodules) throws SBOLValidationException {
+//      for (ModuleDefinition submoduledef : submodules) {
+//          Module submodule = mdef.createModule(submoduledef.getDisplayId(), mdef.getIdentity());
+//      }
+//  }
+
+    public void assemble(ModuleDefinition mdef, ModuleDefinition[] submodules) throws SBOLValidationException, CircuitBuilderException, SynBioHubException {
+        for (ModuleDefinition md : submodules) {
+            Module submodule = mdef.createModule((instanceUID(md.getDisplayId())), md.getIdentity());
+            log.info("Creating submodule " + submodule.getDisplayId());
+            Annotation structure_id = md.getAnnotation(STRUCTURE_PROPERTY);
+            if (structure_id == null) {
+                log.info("ModuleDefinition " + mdef.getIdentity() + " has no structural representation");
+                return;
+            }
+            ComponentDefinition cd = ROOT.getComponentDefinition(structure_id.getURIValue());
+
+            // If the ComponentDefinition isn't already part of this circuit, try to load it from the parts cache
+            if (cd == null) {
+                cd = DefinitionImporter.importComponentDefinition(ROOT, structure_id.getURIValue());
+            }
+            if (cd == null)
+                throw new CircuitBuilderException("Failed to instantiate structural layer for ModuleDefinition " + mdef.getIdentity());
+
+            Component c = STRUCTURE.createComponent(md.getDisplayId(), AccessType.PUBLIC, cd.getIdentity());
+        }
+    }
+
+
+    public void connect(FunctionalComponent male, FunctionalComponent female) throws SBOLValidationException, URISyntaxException, CircuitBuilderException {
+        // TODO:  Get Components corresponding to male's parent Module and female's parent Module. Form Sequence Constraint
+        String bridgeID = instanceUID("");        
+        ComponentDefinition bridge = ROOT.createComponentDefinition(male.getDisplayId() + "_" + female.getDisplayId() + "_bridge"+bridgeID, ComponentDefinition.DNA);
+        bridge.addRole(new URI(SequenceOntology.NAMESPACE + "SO:0000001"));  // Generic sequence feature
+        FunctionalComponent bridge_fc = SYSTEM.createFunctionalComponent(male.getDisplayId() + "_" + female.getDisplayId() + "_bridge"+bridgeID, AccessType.PUBLIC, bridge.getIdentity(), DirectionType.NONE);
+        Component bridge_c = STRUCTURE.createComponent(male.getDisplayId() + "_" + female.getDisplayId() + "_bridge"+bridgeID, AccessType.PUBLIC, bridge.getIdentity());
+        bridge_fc.createAnnotation(STRUCTURE_PROPERTY, bridge_c.getIdentity());
+        override(male, bridge_fc);
+        override(bridge_fc, female);
+    }
+
+    public void connect(FunctionalComponent male, FunctionalComponent female, Function callback) throws SBOLValidationException, URISyntaxException, CircuitBuilderException {
+    	connect(male, female);
+    	callback.apply(null);
+    }
+
+    
+    public void connect(ComponentDefinition male, ComponentDefinition female) throws SBOLValidationException, CircuitBuilderException {
+        ComponentDefinition bridge = ROOT.createComponentDefinition("bridge", male.getTypes());
+        FunctionalComponent bridge_fc = SYSTEM.createFunctionalComponent("bridge", AccessType.PUBLIC, bridge.getIdentity(), DirectionType.NONE);
+        Component bridge_c = STRUCTURE.createComponent("bridge", AccessType.PUBLIC, bridge.getIdentity());
+        bridge_fc.createAnnotation(STRUCTURE_PROPERTY, bridge_c.getIdentity());
+        override(male, bridge);
+        override(bridge, female);
+
+    }
+
+    // Warning: This assumes there is only one FunctionalComponent per ComponentDefinition (which may not always be true)
+    // @todo Handle case that multiple MapsTo instances with the same ID are instantiated
+    public void override(FunctionalComponent mask, FunctionalComponent masked) throws SBOLValidationException, CircuitBuilderException {
+        ModuleDefinition local_mdef = SYSTEM;
+        ModuleDefinition remote_mdef = null;
+        FunctionalComponent local = null;
+        FunctionalComponent remote = null;
+        RefinementType refinement = null;
+        // Identify the FunctionalComponent in the local level of the hierarchy.
+        // Does it correspond to the mask or masked ComponentDefinition?
+        // Set the refinement accordingly
+        for (FunctionalComponent fc : local_mdef.getFunctionalComponents()) {
+            if (fc == mask) {
+                if (refinement != null)
+                    throw new RuntimeException("Call to override method failed. Both components occupy the local level of the Module hierarchy");
+                refinement = RefinementType.USELOCAL;
+                local = fc;
+                System.out.println("Found " + fc.getDisplayId() + " is the local module");
+                System.out.println(fc.getDisplayId() + " will override");
+            } else if (fc == masked) {
+                if (refinement != null)
+                    throw new RuntimeException("Call to override method failed. Both components occupy the local level of the Module hierarchy");
+                refinement = RefinementType.USEREMOTE;
+                local = fc;
+                System.out.println("Found " + fc.getDisplayId() + " is the local module");
+                System.out.println(fc.getDisplayId() + " will be overriden");
+            }
+
+        }
+        if (local == null)
+            throw new RuntimeException("Call to connect method failed. Could not identify a local component");
+
+        // Identify the FunctionalComponent in the remote level of the hierarchy.  Does it correspond to the mask or masked ComponentDefinition?
+        Module remote_module = null;
+        log.info("About to search through " + local_mdef.getModules().size() + " modules.");
+        for (Module submodule : local_mdef.getModules()) {
+            log.info("Searching " + submodule.getDisplayId());
+
+            ModuleDefinition submoduledef = submodule.getDefinition();
+            for (FunctionalComponent fc : submoduledef.getFunctionalComponents()) {
+
+                if (fc == mask || fc == masked) {
+                    remote = fc;
+                    remote_module = submodule;
+                    System.out.println("Found " + fc.getDisplayId() + " is the remote module");
+                    if (fc == mask)
+                        System.out.println(fc.getDisplayId() + " will override");
+                    else
+                        System.out.println(fc.getDisplayId() + " will be overriden");
+                }
+            }
+        }
+        if (remote_module == null)
+            throw new RuntimeException("Call to connect method failed. Could not identify a remote component");
+
+        MapsTo new_connection = remote_module.createMapsTo(mask.getDisplayId() + "_to_" + masked.getDisplayId() + "_connection", refinement, local.getIdentity(), remote.getIdentity());
+
+
+        // Create a mirror MapsTo on the structural layer
+        Annotation ann = remote_module.getDefinition().getAnnotation(STRUCTURE_PROPERTY);
+        if (ann == null) {  // Structural layer is not specified
+            log.info("No structural layer to override");
+            return;
+        }
+        ComponentDefinition substructure = ROOT.getComponentDefinition(ann.getURIValue());
+        if (substructure == null)
+            throw new CircuitBuilderException("Failed to connect Modules. The ComponentDefinition " + ann.getURIValue() + " that specifies the submodule structure is missing.");
+
+        Component bridge = null;
+        for (Component c : STRUCTURE.getComponents()) {
+            if (c.getDefinition() == substructure)
+                bridge = c;
+        }
+        if (bridge == null)
+            throw new CircuitBuilderException("Failed to connect Modules. The Component that specifies the submodule structure is missing.");
+
+        ann = local.getAnnotation(STRUCTURE_PROPERTY);
+        if (ann == null)
+            throw new CircuitBuilderException("Failed to connect Modules. The local Component is not defined.");
+        URI c_local_id = ann.getURIValue();
+        ann = remote.getAnnotation(STRUCTURE_PROPERTY);
+        if (ann == null)
+            throw new CircuitBuilderException("Failed to connect Modules. The remote Component is not defined.");
+        URI c_remote_id = ann.getURIValue();
+        Component c_local = null;
+        Component c_remote = null;
+        c_local = STRUCTURE.getComponent(c_local_id);
+        c_remote = substructure.getComponent(c_remote_id);
+        if (c_local == null && c_remote == null)
+            throw new CircuitBuilderException("Failed to connect Modules. The Components that specify the structure are missing.");
+        bridge.createMapsTo(mask.getDisplayId() + "_to_" + masked.getDisplayId() + "_connection", refinement, c_local_id, c_remote_id);
+        log.info("Override of " + masked.getDisplayId() + " completed.");
+    }
+
+
+
+
+
+    // Warning: This assumes there is only one FunctionalComponent per ComponentDefinition (which may not always be true)
+    // @todo Handle case that multiple MapsTo instances with the same ID are instantiated
+    public void override(ComponentDefinition mask, ComponentDefinition masked) throws SBOLValidationException, CircuitBuilderException {
+        ModuleDefinition local_mdef = SYSTEM;
+        ModuleDefinition remote_mdef = null;
+        FunctionalComponent local = null;
+        FunctionalComponent remote = null;
+        RefinementType refinement = null;
+        // Identify the FunctionalComponent in the local level of the hierarchy.
+        // Does it correspond to the mask or masked ComponentDefinition?
+        // Set the refinement accordingly
+        for (FunctionalComponent fc : local_mdef.getFunctionalComponents()) {
+            if (fc.getDefinition() == mask) {
+                if (refinement != null)
+                    throw new RuntimeException("Call to override method failed. Both components occupy the local level of the Module hierarchy");
+                refinement = RefinementType.USELOCAL;
+                local = fc;
+            } else if (fc.getDefinition() == masked) {
+                if (refinement != null)
+                    throw new RuntimeException("Call to override method failed. Both components occupy the local level of the Module hierarchy");
+                refinement = RefinementType.USEREMOTE;
+                local = fc;
+            }
+        }
+        if (local == null)
+            throw new RuntimeException("Call to connect method failed. Could not identify a local component");
+
+
+        // Identify the FunctionalComponent in the remote level of the hierarchy.  Does it correspond to the mask or masked ComponentDefinition?
+        Module remote_module = null;
+        for (Module submodule : local_mdef.getModules()) {
+            ModuleDefinition submoduledef = submodule.getDefinition();
+            for (FunctionalComponent fc : submoduledef.getFunctionalComponents()) {
+                if (fc.getDefinition() == mask || fc.getDefinition() == masked) {
+                    remote = fc;
+                    remote_module = submodule;
+                }
+            }
+        }
+        if (remote_module == null)
+            throw new RuntimeException("Call to connect method failed. Could not identify a remote component");
+
+        MapsTo new_connection = remote_module.createMapsTo("connection", refinement, local.getIdentity(), remote.getIdentity());
+
+//      // Create a mirror MapsTo on the structural layer
+//      ComponentDefinition structure = null;
+//      URI structure_id = local_mdef.getAnnotation(STRUCTURE_PROPERTY).getURIValue();
+//      if (structure_id == null) {
+//          return;  // Structural layer is not specified
+//      } else
+//          structure = ROOT.getComponentDefinition(structure_id);
+//      if (structure == null)
+//          throw new CircuitBuilderException("Failed to connect Modules. The ComponentDefinition " + structure_id + " that specifies the structure is missing.");
+//      Component c_local = null;
+//      Component c_remote = null;
+//      URI c_local_id = local.getAnnotation(STRUCTURE_PROPERTY).getURIValue();
+//      URI c_remote_id = remote.getAnnotation(STRUCTURE_PROPERTY).getURIValue();
+//      if (c_local_id == null && c_remote_id == null)
+//          throw new CircuitBuilderException("Failed to connect Modules. The Components that specify the structure are missing.");
+//      else
+//      {
+//          c_local = structure.getComponent(c_local_id);
+//          c_remote = structure.getComponent(c_remote_id);
+//      }
+//      if (c_local == null && c_remote == null)
+//          throw new CircuitBuilderException("Failed to connect Modules. The Components that specify the structure are missing.");
+//      c_local.createMapsTo("connection", refinement, c_local_id, c_remote_id);
+    }
+
+    /** @return Access to the SYSTEM design document */
+    public SBOLDocument getDocument() {
+        return ROOT;
+    }
+
+    /** @return Access to the SYSTEM design document */
+    public ModuleDefinition getSystem() {
+        return SYSTEM;
+    }
+
+    public String toExperimentPlanCSV() {
+        String serialization = "";
+        serialization += "Name," + DOSAGE.getLocalPart() + "\n";
+        for (FunctionalComponent fc : SYSTEM.getFunctionalComponents()) {
+            serialization += fc.getDefinition().getName() + ",";
+            serialization += fc.getAnnotation(DOSAGE).getDoubleValue();
+            serialization += "\n";
+        }
+        return serialization;
+    }
+
+    public Boolean validate() {
+        SBOLValidate.validateSBOL(ROOT, true, true, false);
+        // SBOLValidate.validateSBOL(ROOT, true, true, true);
+        if (SBOLValidate.getNumErrors() > 0) {
+            for (String error : SBOLValidate.getErrors()) {
+                System.out.println(error);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public Component getFirstComponent() throws CircuitBuilderException {
+        return CircuitBuilder.getFirstComponent(STRUCTURE);
+    }
+
+    public static Component getFirstComponent(ComponentDefinition cdef) throws CircuitBuilderException {
+//      // Components with MapsTos are ignored until after the SequenceConstraints are resolved
+//      ArrayList<Component> constraint_objects = new ArrayList<Component>(cdef.getComponents());
+//      for (Component c : cdef.getComponents()) {
+//          if (c.getMapsTos().size() > 0) {
+//              constraint_objects.remove(c);
+//          }
+//      }
+        ArrayList<Component> constraint_objects = new ArrayList<Component>(cdef.getComponents());
+        if (constraint_objects.size() != cdef.getSequenceConstraints().size() + 1)
+            throw new CircuitBuilderException("Failed to get first component in primary structure. The primary structure is not well-formed");
+
+        // If a Component is not an object in any SequenceConstraint then it must be the first Component (assuming a well formed primary structure)
+        for (SequenceConstraint sc : cdef.getSequenceConstraints()) {
+            constraint_objects.remove(sc.getObject());
+        }
+        if (constraint_objects.size() != 1)
+            throw new CircuitBuilderException("Failed to get first component in primary structure. The primary structure is not well-formed");
+        return constraint_objects.get(0);
+    }
+
+    public ArrayList<ComponentDefinition> getPrimaryStructure() throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException {
+        return CircuitBuilder.getPrimaryStructure(STRUCTURE);
+    }
+
+//    public static ArrayList<ComponentDefinition> getPrimaryStructure(ComponentDefinition cdef) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException {
+//      ArrayList<ComponentDefinition> primary_structure = new ArrayList<ComponentDefinition>(0);
+//      Component current_component = CircuitBuilder.getFirstComponent(cdef);  // getFirstComponent validates that SequenceConstraints specify a well-formed primary structure
+//      primary_structure.add(current_component.getDefinition());
+//      SequenceConstraint current_constraint = null;
+//      do {
+//          for (SequenceConstraint sc : cdef.getSequenceConstraints()) {
+//              if (sc.getSubject() == current_component) {
+//                  current_constraint = sc;
+//                  current_component = current_constraint.getObject();
+//                  primary_structure.add(current_component.getDefinition());
+//              } else
+//                  current_constraint = null;
+//          }
+//      } while (current_constraint != null);
+//
+//      // Resolve MapsTos
+//      for (Component c : cdef.getComponents()) {
+//          if (c.getMapsTos().size() > 0) {
+//              for (MapsTo m : c.getMapsTos()) {
+//                  if (m.getRefinement() == RefinementType.USEREMOTE) {
+//                      primary_structure.set(primary_structure.indexOf(m.getLocal().getDefinition()), m.getRemote().getDefinition());
+//                  }
+//              }
+//          }
+//      }
+//      return primary_structure;
+//    }
+
+    public ArrayList<ComponentDefinition> getPrimaryStructure(ModuleDefinition mdef) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException {
+        Annotation ann = mdef.getAnnotation(STRUCTURE_PROPERTY);
+        if (ann == null)
+            throw new CircuitBuilderException("Cannot get primary structure of " + mdef.getIdentity() + ". The structural layer is undefined.");
+        URI structure_id = ann.getURIValue();
+        ComponentDefinition structure = ROOT.getComponentDefinition(structure_id);
+        if (structure == null)
+            throw new CircuitBuilderException("Cannot get primary structure of " + mdef.getIdentity() + ". The structural layer is undefined.");
+        ArrayList<ComponentDefinition> primary_structure = getPrimaryStructure(structure);
+
+        // Resolve MapsTos
+        Component structure_instance = null;
+        for (Component c : STRUCTURE.getComponents())
+            if (c.getDefinition().equals(structure))
+                structure_instance = c;
+        if (structure_instance != null) {
+            for (Component c : STRUCTURE.getComponents()) {
+                if (c.getMapsTos().size() > 0) {
+                    for (MapsTo m : c.getMapsTos()) {
+                        if (m.getRefinement() == RefinementType.USELOCAL) {
+                            System.out.println("Replacing " + m.getRemote().getDefinitionURI() + " with " + m.getLocal().getDefinitionURI());
+                            System.out.println("Replacing " + primary_structure.indexOf(m.getRemote().getDefinition()));
+                            primary_structure.set(primary_structure.indexOf(m.getRemote().getDefinition()), m.getLocal().getDefinition());
+                        }
+                    }
+                }
+            }
+            for (Component c : STRUCTURE.getComponents()) {
+                if (c.getMapsTos().size() > 0) {
+                    for (MapsTo m : c.getMapsTos()) {
+                        if (m.getRefinement() == RefinementType.USEREMOTE) {
+                            primary_structure.set(primary_structure.indexOf(m.getLocal().getDefinition()), m.getRemote().getDefinition());
+                        }
+                    }
+                }
+            }
+        }
+
+
+        return primary_structure;
+    }
+
+    public static ArrayList<ComponentDefinition> getPrimaryStructure(ComponentDefinition cdef) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException {
+        if (cdef.getComponents().size() == 0) {
+            ArrayList<ComponentDefinition> primary_structure = new ArrayList<ComponentDefinition>(0);
+            primary_structure.add(cdef);
+            return primary_structure;
+        }
+        ArrayList<ComponentDefinition> primary_structure = new ArrayList<ComponentDefinition>(0);
+        Component current_component = getFirstComponent(cdef);  // getFirstComponent validates that SequenceConstraints specify a well-formed primary structure
+        primary_structure.addAll(getPrimaryStructure(current_component.getDefinition())); // First recursive call
+        SequenceConstraint current_constraint = null;
+        do {
+            for (SequenceConstraint sc : cdef.getSequenceConstraints()) {
+                if (sc.getSubject() == current_component) {
+                    current_constraint = sc;
+                    current_component = current_constraint.getObject();
+                    primary_structure.addAll(getPrimaryStructure(current_component.getDefinition()));
+                    break;
+                } else
+                    current_constraint = null;
+            }
+        } while (current_constraint != null);
+        return primary_structure;
+    }
+
+
+    public void assemblePrimaryStructure(ModuleDefinition mdef, ComponentDefinition[] primary_structure) throws SBOLValidationException, CircuitBuilderException {
+        if (primary_structure.length < 2)
+            return;
+        URI cdef_id = mdef.getAnnotation(STRUCTURE_PROPERTY).getURIValue();
+        ComponentDefinition cdef = ROOT.getComponentDefinition(cdef_id);
+        // Get Components corresponding to ComponentDefinitions in primary_structure
+        ArrayList<Component> module_components = new ArrayList(cdef.getComponents());
+        ArrayList<Component> sorted_components = new ArrayList();
+        for (ComponentDefinition cd : primary_structure) {
+            for (Component c : module_components) {
+                if (c.getDefinition().equals(cd)) {
+                    sorted_components.add(c);
+                }
+            }
+        }
+
+        // Validate that ComponentDefinitions in primary_structure are part of this ModuleDefinition
+        if (sorted_components.size() != module_components.size())
+            throw new CircuitBuilderException("Failed to assemble primary structure. One of the ComponentDefinitions is not part of the ModuleDefinition.  sorted_components.size() = " + sorted_components.size() + ", and module_components.size() = " + module_components.size());
+
+        for (Integer i_c = 0; i_c < sorted_components.size() - 1; ++i_c) {
+            SequenceConstraint sc = cdef.createSequenceConstraint("sc_" + i_c.toString(), RestrictionType.PRECEDES, sorted_components.get(i_c).getIdentity(), sorted_components.get(i_c + 1).getIdentity());
+        }
+        return;
+    }
+
+    public String compile(ModuleDefinition mdef) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException, SynBioHubException {
+        Annotation ann = mdef.getAnnotation(STRUCTURE_PROPERTY);
+        if (ann == null)
+            throw new CircuitBuilderException("Failed to compile " + mdef.getIdentity() + ". The structural layer is undefined.");
+        URI structure_id = ann.getURIValue();
+        ComponentDefinition structure = ROOT.getComponentDefinition(structure_id);
+        if (structure == null)
+            throw new CircuitBuilderException("Failed to compile " + mdef.getIdentity() + ". The structural layer is undefined.");
+
+        ArrayList<ComponentDefinition> primary_structure = instance.getPrimaryStructure(mdef);
+        System.out.println("Compiling");
+        for (ComponentDefinition cd : primary_structure)
+            System.out.println(cd.getDisplayId() + "\t" + cd.getSequenceIdentities().size());
+
+        for (ComponentDefinition cd : primary_structure) {
+            if (cd.getSequenceIdentities().size() == 0)
+                throw new CircuitBuilderException("Failed to compile. A Sequence is undefined for ComponentDefinition " + cd.getIdentity());
+            URI seq_id = cd.getSequenceIdentities().iterator().next();
+
+            Sequence seq = ROOT.getSequence(seq_id);
+            // If the Sequence isn't already part of this circuit, try to load it from the parts cache
+            if (seq == null)
+                seq = DefinitionImporter.importSequence(ROOT, seq_id);
+            if (seq == null)
+                throw new CircuitBuilderException("Failed to compile. Could not import Sequence for ComponentDefinition " + cd.getIdentity());
+        }
+        String composite_nucleotide_sequence = "";
+        for (ComponentDefinition cd : primary_structure) {
+            Sequence seq = cd.getSequences().iterator().next();
+            if (seq == null)
+                throw new CircuitBuilderException("Failed to compile. A Sequence is undefined for ComponentDefinition " + cd.getIdentity());
+            composite_nucleotide_sequence += seq.getElements();
+        }
+        return composite_nucleotide_sequence;
+    }
+
+    static public String compile(ComponentDefinition structure) throws CircuitBuilderException, SBOLValidationException, IOException, SBOLConversionException, SynBioHubException {
+        ArrayList<ComponentDefinition> primary_structure = CircuitBuilder.getPrimaryStructure(structure);
+        String composite_nucleotide_sequence = "";
+        for (ComponentDefinition cd : primary_structure) {
+            Sequence seq = cd.getSequences().iterator().next();
+            if (seq == null)
+                throw new CircuitBuilderException("Failed to compile. A Sequence is undefined for ComponentDefinition " + cd.getIdentity());
+            composite_nucleotide_sequence += seq.getElements();
+        }
+        return composite_nucleotide_sequence;
+    }
+
+
+    private static void flatten() throws CircuitBuilderException {
+
+    }
+
+
+    public ModuleDefinition createDifferentiationSwitch(String displayId) throws CircuitBuilderException, SBOLValidationException, URISyntaxException, SynBioHubException, IOException, SBOLConversionException {
+        ComponentDefinition strain0ConstitutivePromoter = this.getComponentDefinition(new URI("https://bbn.com/UbC"));
+        ComponentDefinition strain1ConstitutivePromoter = this.getComponentDefinition(new URI("https://bbn.com/hEF1a"));
+        return this.createDifferentiationSwitch(displayId, strain0ConstitutivePromoter, strain1ConstitutivePromoter);
+    }
+
+    public ModuleDefinition createDifferentiationSwitch(String displayId, ComponentDefinition reporter_1, ComponentDefinition reporter_2) throws CircuitBuilderException, SBOLValidationException, URISyntaxException, SynBioHubException, IOException, SBOLConversionException {
+        // use a default promoter, terminator1, terminator2
+        ComponentDefinition promoter = this.getComponentDefinition(new URI("https://bbn.com/generic_promoter"));
+        ComponentDefinition t1 = this.getComponentDefinition(new URI("https://bbn.com/t1"));
+        ComponentDefinition t2 = this.getComponentDefinition(new URI("https://bbn.com/t2"));
+
+        return createDifferentiationSwitch(displayId, promoter, t1, reporter_1, t2, reporter_2);
+    }
+
+    public ModuleDefinition createDifferentiationSwitch(String displayId, ComponentDefinition promoter, ComponentDefinition terminator_1, ComponentDefinition reporter_1, ComponentDefinition terminator_2, ComponentDefinition reporter_2) throws CircuitBuilderException, SBOLValidationException, URISyntaxException, SynBioHubException, IOException, SBOLConversionException {
+        log.info("createDifferentiationSwitch called, displayId = " + displayId);
+        if (terminator_1 == null) {
+            log.info("bad terminator_1");
+        }
+        if (reporter_1 == null) {
+            log.info("bad reporter_1");
+        }
+        if (terminator_2 == null) {
+            log.info("bad terminator_2");
+        }
+        if (reporter_2 == null) {
+            log.info("bad reporter_2");
+        }
+        if (displayId == null || terminator_1 == null || reporter_1 == null || terminator_2 == null || reporter_2 == null) {
+            throw new IllegalArgumentException("Supplied null arguments to createDifferentiationSwitch");
+        }
+        ComponentDefinition attP_site1 = this.getComponentDefinition(new URI("https://bbn.com/attP_site1"));
+        ComponentDefinition attB_site1 = this.getComponentDefinition(new URI("https://bbn.com/attB_site1"));
+        ComponentDefinition attP_site2 = this.getComponentDefinition(new URI("https://bbn.com/attP_site2"));
+        ComponentDefinition attB_site2 = this.getComponentDefinition(new URI("https://bbn.com/attB_site2"));
+
+        ComponentDefinition[] components = { promoter, attP_site1, attB_site1, terminator_1, attP_site2, reporter_1, terminator_2, attB_site2, reporter_2 };
+        ModuleDefinition mdef = createModuleDefinition(displayId, components);
+        mdef.addRole(new URI(DIFFERENTIATION_MODULE));
+        assemblePrimaryStructure(mdef, components);
+        // Reset Direction of promoter's FunctionalComponent
+        for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+            if (fc.getDefinition().equals(attP_site1)) {
+                fc.setDirection(DirectionType.IN);
+            }
+            if (fc.getDefinition().equals(attB_site1)) {
+                fc.setDirection(DirectionType.IN);
+            }
+            if (fc.getDefinition().equals(attP_site2)) {
+                fc.setDirection(DirectionType.IN);
+            }
+            if (fc.getDefinition().equals(attB_site2)) {
+                fc.setDirection(DirectionType.IN);
+            }
+        }
+        FunctionalComponent switch_fc = mdef.createFunctionalComponent(displayId + "_fc", AccessType.PUBLIC, mdef.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+        return mdef;
+    }
+
+    public ModuleDefinition createDegredationTaggedCDS(String displayId, ComponentDefinition cds, ComponentDefinition degredationTag) throws CircuitBuilderException, SBOLValidationException, URISyntaxException, SynBioHubException, IOException, SBOLConversionException {
+        log.info("createDegredationTaggedCDS called, displayId = " + displayId);
+        if (cds == null) {
+            log.info("bad cds");
+        }
+        if (degredationTag == null) {
+            log.info("bad degredationTag");
+        }
+        if (displayId == null) {
+            throw new IllegalArgumentException("Supplied null arguments to createDifferentiationSwitch");
+        }
+        // degredationTag = this.getComponentDefinition(new URI("https://bbn.com/BBa_J176018"));
+        ComponentDefinition promoter = this.getComponentDefinition(new URI("https://bbn.com/generic_promoter"));
+
+        ComponentDefinition[] components = {promoter, cds, degredationTag};
+        ModuleDefinition mdef = createModuleDefinition(displayId, components);
+        mdef.addRole(new URI(EXPRESSION_MODULE));
+
+        log.info("created the mdef: " + mdef.toString());
+
+        assemblePrimaryStructure(mdef, components);
+
+        // Reset Direction of promoter's FunctionalComponent
+        // for (FunctionalComponent fc : mdef.getFunctionalComponents()) {
+        //     if (fc.getDefinition().equals(attP_site1)) {
+        //         fc.setDirection(DirectionType.IN);
+        //     }
+        //     if (fc.getDefinition().equals(attB_site1)) {
+        //         fc.setDirection(DirectionType.IN);
+        //     }
+        //     if (fc.getDefinition().equals(attP_site2)) {
+        //         fc.setDirection(DirectionType.IN);
+        //     }
+        //     if (fc.getDefinition().equals(attB_site2)) {
+        //         fc.setDirection(DirectionType.IN);
+        //     }
+        // }
+        FunctionalComponent taggedCDS_fc = mdef.createFunctionalComponent(displayId + "_fc", AccessType.PUBLIC, mdef.getAnnotation(STRUCTURE_PROPERTY).getURIValue(), DirectionType.NONE);
+        return mdef;
+    }    
+
+//    private static void flatten() throws CircuitBuilderException {
+//      Hashtable<FunctionalComponent, Component> correlated_structure_and_function = new Hashtable<FunctionalComponent, Component>();
+//      for (FunctionalComponent fc : SYSTEM.getFunctionalComponents()) {
+//          for (Component c : STRUCTURE.getComponents()) {
+//              if (fc.getDefinition() == c.getDefinition()) {
+//                  correlated_structure_and_function.put(fc, c);
+//              }
+//          }
+//      }
+//      for (FunctionalComponent fc : SYSTEM.getFunctionalComponents()) {
+//          Annotation structure_id = fc.getAnnotation(STRUCTURE_PROPERTY);
+//          if (structure_id == null)
+//              throw new CircuitBuilderException("Cannot flatten design. The structural layer is not valid");
+//
+//          Component c = STRUCTURE.getComponent(structure_id.getURIValue());
+//          correlated_structure_and_function.put(fc, c);
+//      }
+//      for (Module submodule : SYSTEM.getModules()) {
+//          ModuleDefinition submodule_def = submodule.getDefinition();
+//          URI structure = submodule_def.getAnnotation(STRUCTURE_PROPERTY).getURIValue();
+//          ComponentDefinition subcomponent_def = ROOT.getComponentDefinition(structure);
+//          for (FunctionalComponent fc : submodule_def.getFunctionalComponents()) {
+//              for (Component c : subcomponent_def.getComponents()) {
+//                  if (fc.getDefinition() == c.getDefinition()) {
+//                      correlated_structure_and_function.put(fc, c);
+//                  }
+//              }
+//          }
+//      }
+//
+//      Hashtable<Component, Component> overrides = new Hashtable<Component, Component>();
+//      for (Module submodule : SYSTEM.getModules()) {
+//          for (MapsTo map : submodule.getMapsTos()) {
+//              if (map.getRefinement() == RefinementType.USELOCAL) {
+//                  FunctionalComponent local = (FunctionalComponent)map.getLocal();
+//                  FunctionalComponent remote = (FunctionalComponent)map.getRemote();
+//                  correlated_structure_and_function.remove(remote);
+//              }
+//              else if (map.getRefinement() == RefinementType.USEREMOTE) {
+//                  FunctionalComponent local = (FunctionalComponent)map.getLocal();
+//                  FunctionalComponent remote = (FunctionalComponent)map.getRemote();
+//                  correlated_structure_and_function.remove(local);
+//              }
+//              else if (map.getRefinement() == RefinementType.VERIFYIDENTICAL) {
+//                  FunctionalComponent local = (FunctionalComponent)map.getLocal();
+//                  FunctionalComponent remote = (FunctionalComponent)map.getRemote();
+//                  correlated_structure_and_function.remove(local);  // can remove either local or remote, in this case it's arbitrary
+//              }
+//          }
+//      }
+//    }
+}
