@@ -1,7 +1,4 @@
-import sys
-sys.path
-sys.path.append('/Users/bbartley/Dev/git/libSBOL/release/wrapper/Mac_64_2')
-
+from sbol import *
 from seva import *
 
 ### Create default SEVA vectors

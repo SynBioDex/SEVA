@@ -1,7 +1,3 @@
-import sys
-sys.path
-sys.path.append('/Users/bbartley/Dev/git/libSBOL/release/wrapper/Mac_64_2/sbol')
-
 from sbol import *
 
 SO_ORIGIN = SO + "0000296"

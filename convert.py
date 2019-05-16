@@ -1,7 +1,3 @@
-import sys
-sys.path
-sys.path.append('/Users/bbartley/Dev/git/libSBOL/release/wrapper/Mac_64_2')
-
 from sbol import *
 
 #doc = Document('pSEVA111.xml')

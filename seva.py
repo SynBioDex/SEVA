@@ -1,7 +1,3 @@
-import sys
-sys.path
-sys.path.append('/Users/bbartley/Dev/git/libSBOL/release/wrapper/Mac_64_2')
-
 from sbol import *
 
 SO_FIVE_PRIME_STICKY_END_RESTRICTION_ENZYME_CLEAVAGE_SITE = SO + "0001975"
