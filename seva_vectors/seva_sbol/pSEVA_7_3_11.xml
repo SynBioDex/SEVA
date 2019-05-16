@@ -1,0 +1,910 @@
+<?xml version="1.0" ?>
+<rdf:RDF xmlns:prov="http://www.w3.org/ns/prov#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sys-bio="http://sys-bio.org#" xmlns:sbol="http://sbols.org/v2#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11_seq/1">
+    <sbol:displayId>pSEVA_7_3_11_seq</sbol:displayId>
+    <sbol:elements>TTAATTAAAGCGGATAACAATTTCACACAGGAGGCCGCCTAGGCCGCGGCCGCGCGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGTCAAAAAACAATAGAGGAGACTGAATTTTCAGACACGAGATTGGTGTGTTCCTGTCTGATTTCGATGGGTGTTTTCCCAAAAAATTTTTGAAATACTCGGGTCATATGGCTCTGATCGCAAAAACCGGCTTCACTGGCAATCACTTTCAGTGGAATTTCTTTTTTTGAAGTGAGCAAACGTTTAGCAAATTGCACCCTGAGATTCATGATGTAGGCAGCAGGGGAATTACCAAAATCGACTTTAAATTTTCTCATTAAATGAGGCACGCTCATCTTGACTAATCCCGCTAAATCTTCGAGGGTAATTTTAATGCTCATGTTTTCATTGATAAATTCTAATAACAGTCTGCGTTGTAGGGGAGTAAAACCAGAACGGCACTGTCCTTCCTTAAAATCTAATTTGGCATACTGACGGAGTAAATGCAGGGCGATCTGGTTTTTAATGCTCTCTAAATACAGGTTTCCACCTAAACCACCTTGCTTTAATTCTAGTTCTAAAAGTGAAGTCAGAGCAGGTAAAACATGATCTTCCACACCGACTTCGTCTCTGATTCGGATCGAAGCGATATCATAATCAAACACCTTATTCGCCATTGAGGTGATGGAGTCATGCGAAATGTAGACATGGGTGACGGCAATATGGTCATTCCACGCCCAGCGGGAATCTTCACCACAGGTCAACAAGGAGACATAACCCGGCTTAACCACTTGGGTATCCCAAGAGGCATCGCCTTTTCTACGCATTTCCGCCGCACTTTTTTTATAGTTGACGATCATGTAGTCACGCATGGCAGGAATATGCACATCGAGGTTGGTATATTCGTACCCTCTGATTGCAATGTTTTCCCAACCGGCATTCATGCTGTCAATTGTGACATTACCCGGAATCCATAACACGACATCTTCGGGTTTGATCAGCGTATTTGCTTTGTCTGTGCTCATGCTAGCTTTTTCCTCCTTATAAAGTTAATCAACACCCCTTGTATTACTGTTTATGTAAGCAGACAGTTTTATTGTTCATGATGATATATTTTTATCTTGTGCAATGTAACATCAGAGATTTTGAGACACAAGACGTGGCAAAAAACATTATCCAGAACGGGAGTGCGCCTTGAGCGACACGAATTATGCAGTGATTTACGACCTGCACAGCCATACCACAGCTTCCGATGGCTGCCTGACGCCAGAAGCATTGGTGCACCGTGCAGTCGATGATAAGCTGTCAAACAGCGGATAACAATTTCACACAGGAGCAACTAAAAGAGATTGTTTGGATCAGTTACCCAAAATCGTTGAAAAGATTTTAACTCTTCGATTTTTATTTTTTAGGTAATCCTAGCCCTCTCGGGGGCTAGGATTAAAAATTTTAAGTTATTCCAACACGAATGACAAATTGTTCAATGCAAAATAAAAACATACAATATATAAATATATTTTTTAAATAAAACATAAGATTACAATAAAATAAGAATTTTTATTTGGAGTTTGTTTTTTTTCTACAATGATCATTATGTACAATTTTTAGGTTCACCCCATCCAAGCCTTGTGATTGCATTCCTGCGATTCTTTATTCAATGAATAAGCAATGCTATTAATCAGCAATGAATAACCAGCAGTGCAGATTTTGAATAAATTCACATGTCGTAATCCTAGGCCGCGGCCGCGCGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGGCATGCAAGCTTGCGGCCGCGTCGTGACTGGGAAAACCCTGGCGACTAGTCTTGGACTCCTGTTGATAGATCCAGTAATGACCTCAGAACTCCATCTGGATTTGTTCAGAACGCTCGGTTGCCGCCGGGCGTTTTTTATTGGTGAGAATCCAGGGGTCCCCAATAATTACGATTTACGTATTTAAATTTGTGTCTCAAAATCTCTGATGTTACATTGCACAAGATAAAAATATATCATCATGAACAATAAAACTGTCTGCTTACATAAACAGTAATACAAGGGGTGTTGTGAAACTATCACTAATGGTAGCTATATCGAAGAATGGAGTTATCGGGAATGGCCCTGATATTCCTTGGAGTGCCAAAGGTGAACAGCTCCTGTTTAAAGCTATTACCTATAACCAATGGCTGTTGGTTGGACGCAAGACTTTTGAATCAATGGGAGCATTACCCAACCGAAAGTATGCGGTCGTAACACGTTCAAGTTTTACATCTGACAATGAGGACGTATTGATCTTTCCATCAATTAAAGATGCTTTAACCAACCTAAAGAAAATAACGGATCATGTCATTGTTTCAGGTGGTGGGGAGATATACAAAAGCCTGATCGATCAAGTAGATACACTACATATATCTACAATAGACATCGAGCCGGAAGGTGATGTTTACTTTCCTGAAATCCCCAGCAATTTTAGGCCAGTTTTTACCCAAGACTTCGCCTCTAACATAAATTATAGTTACCAAATCTGGCAAAAGGGTTAATAATTAATTGGACCGTTGTCCTTTTCCGCTGCATAACCCTGCTTCGGGGTCATTATAGCGATTTTTTCGGTATATCCATCCTTTTTCGCACGATATACAGGATTTTGCCAAAGGGTTCGTGTAGACTTTCCTTGGTGTATCCAACGGCGTCAGCCGGGCAGGATAGGTGAAGTAGGCCCACCCGCGAGCGGGTGTTCCTTCTTCACTGTCCCTTATTCGCACCTGGCGGTGCTCAACGGGAATCCTGCTCTGCGAGGCTGGCCGTAGGCCGGCCCTACCGGCGCGGCAGCGTTACCCGTGTCGGCGGCTCCAACGGCTCGCCATCGTCCAGAAAACACGGCTCATCGGGCATCGGCAGGCGCTGCTGCCCGCGCCGTTCCCATTCCTCCGTTTCGGTCAAGGCTGGCAGGTCTGGTTCCATGCCCGGAATGCCGGGCTGGCTGGGCGGCTCCTCGCCGGGGCCGGTCGGTAGTTGCTGCTCGCCCGGATACAGGGTCGGGATGCGGCGCAGGTCGCCATGCCCCAACAGCGATTCGTCCTGGTCGTCGTGATCAACCACCACGGCGGCACTGAACACCGACAGGCGCAACTGGTCGCGGGGCTGGCCCCACGCCACGCGGTCATTGACCACGTAGGCCGACACGGTGCCGGGGCCGTTGAGCTTCACGACGGAGATCCAGCGCTCGGCCACCAAGTCCTTGACTGCGTATTGGACCGTCCGCAAAGAACGTCCGATGAGCTTGGAAAGTGTCTTCTGGCTGACCACCACGGCGTTCTGGTGGCCCATCTGCGCCACGAGGTGATGCAGCAGCATTGCCGCCGTGGGTTTCCTCGCAATAAGCCCGGCCCACGCCTCATGCGCTTTGCGTTCCGTTTGCACCCAGTGACCGGGCTTGTTCTTGGCTTGAATGCCGATTTCTCTGGACTGCGTGGCCATGCTTATCTCCATGCGGTAGGGGTGCCGCACGGTTGCGGCACCATGCGCAATCAGCTGCAACTTTTCGGCAGCGCGACAACAATTATGCGTTGCGTAAAAGTGGCAGTCAATTACAGATTTTCTTTAACCTACGCAATGAGCTATTGCGGGGGGTGCCGCAATGAGCTGTTGCGTACCCCCCTTTTTTAAGTTGTTGATTTTTAAGTCTTTCGCATTTCGCCCTATATCTAGTTCTTTGGTGCCCAAAGAAGGGCACCCCTGCGGGGTTCCCCCACGCCTTCGGCGCGGCTCCCCCTCCGGCAAAAAGTGGCCCCTCCGGGGCTTGTTGATCGACTGCGCGGCCTTCGGCCTTGCCCAAGGTGGCGCTGCCCCCTTGGAACCCCCGCACTCGCCGCCGTGAGGCTCGGGGGGCAGGCGGGCGGGCTTCGCCCTTCGACTGCCCCCACTCGCATAGGCTTGGGTCGTTCCAGGCGCGTCAAGGCCAAGCCGCTGCGCGGTCGCTGCGCGAGCCTTGACCCGCCTTCCACTTGGTGTCCAACCGGCAAGCGAAGCGCGCAGGCCGCAGGCCGGAGGCTTTTCCCCAGAGAAAATTAAAAAAATTGATGGGGCAAGGCCGCAGGCCGCGCAGTTGGAGCCGGTGGGTATGTGGTCGAAGGCTGGGTAGCCGGTGGGCAATCCCTGTGGTCAAGCTCGTGGGCAGGCGCAGCCTGTCCATCAGCTTGTCCAGCAGGGTTGTCCACGGGCCGAGCGAAGCGAGCCAGCCGGTGGCCGCTCGCGGCCATCGTCCACATATCCACGGGCTGGCAAGGGAGCGCAGCGACCGCGCAGGGCGAAGCCCGGAGAGCAAGCCCGTAGGGGGGGCGCGCCCAGCTGTCTAGGGCGGCGGATTTGTCCTACTCAGGAGAGCGTTCACCGACAAACAACAGATAAAACGAAAGGCCCAGTCTTTCGACTGAGCCTTTCGTTTTATTTGATGCCT</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11_seq"/>
+    <sbol:version>1</sbol:version>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqAscI">
+    <sbol:displayId>seqAscI</sbol:displayId>
+    <sbol:elements>GGCGCGCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqAscI"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqFseI">
+    <sbol:displayId>seqFseI</sbol:displayId>
+    <sbol:elements>GGCCGGCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqFseI"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqOriT">
+    <sbol:displayId>seqOriT</sbol:displayId>
+    <sbol:elements>CTTTTCCGCTGCATAACCCTGCTTCGGGGTCATTATAGCGATTTTTTCGGTATATCCATCCTTTTTCGCACGATATACAGGATTTTGCCAAAGGGTTCGTGTAGACTTTCCTTGGTGTATCCAACGGCGTCAGCCGGGCAGGATAGGTGAAGTAGGCCCACCCGCGAGCGGGTGTTCCTTCTTCACTGTCCCTTATTCGCACCTGGCGGTGCTCAACGGGAATCCTGCTCTGCGAGGCTGGCCGTA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqOriT"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqPshAI_v7">
+    <sbol:displayId>seqPshAI_v7</sbol:displayId>
+    <sbol:elements>GACCGTTGTC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqPshAI_v7"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqSwaI">
+    <sbol:displayId>seqSwaI</sbol:displayId>
+    <sbol:elements>ATTTAAAT</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqSwaI"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqSanDI">
+    <sbol:displayId>seqSanDI</sbol:displayId>
+    <sbol:elements>GGGTCCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqSanDI"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqT1">
+    <sbol:displayId>seqT1</sbol:displayId>
+    <sbol:elements>CAGCTGTCTAGGGCGGCGGATTTGTCCTACTCAGGAGAGCGTTCACCGACAAACAACAGATAAAACGAAAGGCCCAGTCTTTCGACTGAGCCTTTCGTTTTATTTGATGCCT</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqT1"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqpBBR1">
+    <sbol:displayId>seqpBBR1</sbol:displayId>
+    <sbol:elements>CTACCGGCGCGGCAGCGTTACCCGTGTCGGCGGCTCCAACGGCTCGCCATCGTCCAGAAAACACGGCTCATCGGGCATCGGCAGGCGCTGCTGCCCGCGCCGTTCCCATTCCTCCGTTTCGGTCAAGGCTGGCAGGTCTGGTTCCATGCCCGGAATGCCGGGCTGGCTGGGCGGCTCCTCGCCGGGGCCGGTCGGTAGTTGCTGCTCGCCCGGATACAGGGTCGGGATGCGGCGCAGGTCGCCATGCCCCAACAGCGATTCGTCCTGGTCGTCGTGATCAACCACCACGGCGGCACTGAACACCGACAGGCGCAACTGGTCGCGGGGCTGGCCCCACGCCACGCGGTCATTGACCACGTAGGCCGACACGGTGCCGGGGCCGTTGAGCTTCACGACGGAGATCCAGCGCTCGGCCACCAAGTCCTTGACTGCGTATTGGACCGTCCGCAAAGAACGTCCGATGAGCTTGGAAAGTGTCTTCTGGCTGACCACCACGGCGTTCTGGTGGCCCATCTGCGCCACGAGGTGATGCAGCAGCATTGCCGCCGTGGGTTTCCTCGCAATAAGCCCGGCCCACGCCTCATGCGCTTTGCGTTCCGTTTGCACCCAGTGACCGGGCTTGTTCTTGGCTTGAATGCCGATTTCTCTGGACTGCGTGGCCATGCTTATCTCCATGCGGTAGGGGTGCCGCACGGTTGCGGCACCATGCGCAATCAGCTGCAACTTTTCGGCAGCGCGACAACAATTATGCGTTGCGTAAAAGTGGCAGTCAATTACAGATTTTCTTTAACCTACGCAATGAGCTATTGCGGGGGGTGCCGCAATGAGCTGTTGCGTACCCCCCTTTTTTAAGTTGTTGATTTTTAAGTCTTTCGCATTTCGCCCTATATCTAGTTCTTTGGTGCCCAAAGAAGGGCACCCCTGCGGGGTTCCCCCACGCCTTCGGCGCGGCTCCCCCTCCGGCAAAAAGTGGCCCCTCCGGGGCTTGTTGATCGACTGCGCGGCCTTCGGCCTTGCCCAAGGTGGCGCTGCCCCCTTGGAACCCCCGCACTCGCCGCCGTGAGGCTCGGGGGGCAGGCGGGCGGGCTTCGCCCTTCGACTGCCCCCACTCGCATAGGCTTGGGTCGTTCCAGGCGCGTCAAGGCCAAGCCGCTGCGCGGTCGCTGCGCGAGCCTTGACCCGCCTTCCACTTGGTGTCCAACCGGCAAGCGAAGCGCGCAGGCCGCAGGCCGGAGGCTTTTCCCCAGAGAAAATTAAAAAAATTGATGGGGCAAGGCCGCAGGCCGCGCAGTTGGAGCCGGTGGGTATGTGGTCGAAGGCTGGGTAGCCGGTGGGCAATCCCTGTGGTCAAGCTCGTGGGCAGGCGCAGCCTGTCCATCAGCTTGTCCAGCAGGGTTGTCCACGGGCCGAGCGAAGCGAGCCAGCCGGTGGCCGCTCGCGGCCATCGTCCACATATCCACGGGCTGGCAAGGGAGCGCAGCGACCGCGCAGGGCGAAGCCCGGAGAGCAAGCCCGTAGGGGG</sbol:elements>
+    <sbol:encoding rdf:resource="http://seva.cnb.csic.eshttp://seva.cnb.csic.es/"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqpBBR1"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqTmp">
+    <sbol:displayId>seqTmp</sbol:displayId>
+    <sbol:elements>TTGTGTCTCAAAATCTCTGATGTTACATTGCACAAGATAAAAATATATCATCATGAACAATAAAACTGTCTGCTTACATAAACAGTAATACAAGGGGTGTTGTGAAACTATCACTAATGGTAGCTATATCGAAGAATGGAGTTATCGGGAATGGCCCTGATATTCCTTGGAGTGCCAAAGGTGAACAGCTCCTGTTTAAAGCTATTACCTATAACCAATGGCTGTTGGTTGGACGCAAGACTTTTGAATCAATGGGAGCATTACCCAACCGAAAGTATGCGGTCGTAACACGTTCAAGTTTTACATCTGACAATGAGGACGTATTGATCTTTCCATCAATTAAAGATGCTTTAACCAACCTAAAGAAAATAACGGATCATGTCATTGTTTCAGGTGGTGGGGAGATATACAAAAGCCTGATCGATCAAGTAGATACACTACATATATCTACAATAGACATCGAGCCGGAAGGTGATGTTTACTTTCCTGAAATCCCCAGCAATTTTAGGCCAGTTTTTACCCAAGACTTCGCCTCTAACATAAATTATAGTTACCAAATCTGGCAAAAGGGTTAATAATTAATTG</sbol:elements>
+    <sbol:encoding rdf:resource="http://seva.cnb.csic.eshttp://seva.cnb.csic.es/"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqTmp"/>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/OriT">
+    <dcterms:description>Seva OriT</dcterms:description>
+    <dcterms:title>OriT</dcterms:title>
+    <sbol:displayId>OriT</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/OriT"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqOriT"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/PshAI_v7">
+    <dcterms:description>Seva PshAI</dcterms:description>
+    <dcterms:title>PshAI</dcterms:title>
+    <sbol:displayId>PshAI_v7</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/PshAI_v7"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0001687"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqPshAI_v7"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/FseI">
+    <dcterms:description>Seva FseI</dcterms:description>
+    <dcterms:title>FseI</dcterms:title>
+    <sbol:displayId>FseI</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/FseI"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0001687"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqFseI"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/SwaI">
+    <dcterms:description>Seva SwaI</dcterms:description>
+    <dcterms:title>SwaI</dcterms:title>
+    <sbol:displayId>SwaI</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/SwaI"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0001687"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqSwaI"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/SanDI">
+    <dcterms:description>Seva SanDI</dcterms:description>
+    <dcterms:title>SanDI</dcterms:title>
+    <sbol:displayId>SanDI</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/SanDI"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0001687"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqSanDI"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/seq/seqT0">
+    <sbol:displayId>seqT0</sbol:displayId>
+    <sbol:elements>CTTGGACTCCTGTTGATAGATCCAGTAATGACCTCAGAACTCCATCTGGATTTGTTCAGAACGCTCGGTTGCCGCCGGGCGTTTTTTATTGGTGAGAATCCAG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/seq/seqT0"/>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/T0">
+    <dcterms:description>Seva T0</dcterms:description>
+    <dcterms:title>T0</dcterms:title>
+    <sbol:displayId>T0</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/T0"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000141"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqT0"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/T1">
+    <dcterms:description>example T1</dcterms:description>
+    <dcterms:title>T1</dcterms:title>
+    <sbol:displayId>T1</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/T1"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000141"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqT1"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/cd/T1/ScarT1a">
+        <sbol:displayId>ScarT1a</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/T1/ScarT1a"/>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/cd/T1/ScarT1a/ScarT1aloc">
+            <sbol:displayId>ScarT1aloc</sbol:displayId>
+            <sbol:end>6</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/T1/ScarT1a/ScarT1aloc"/>
+            <sbol:start>1</sbol:start>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/cd/T1/T1seq">
+        <sbol:displayId>T1seq</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/T1/T1seq"/>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/cd/T1/T1seq/T1seqloc">
+            <sbol:displayId>T1seqloc</sbol:displayId>
+            <sbol:end>111</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/T1/T1seq/T1seqloc"/>
+            <sbol:start>7</sbol:start>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/cd/T1/ScarT1b">
+        <sbol:displayId>ScarT1b</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/T1/ScarT1b"/>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/cd/T1/ScarT1b/ScarT1bloc">
+            <sbol:displayId>ScarT1bloc</sbol:displayId>
+            <sbol:end>112</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/T1/ScarT1b/ScarT1bloc"/>
+            <sbol:start>112</sbol:start>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/Tmp">
+    <dcterms:description>Seva Trimethoprim</dcterms:description>
+    <dcterms:title>Trimethoprim</dcterms:title>
+    <sbol:displayId>Tmp</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/Tmp"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000704"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqTmp"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/http://seva.cnb.csic.es/seq/scar1">
+    <sbol:displayId>scar1_seq</sbol:displayId>
+    <sbol:elements>CAATAATTACGATTTACGT</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/http://seva.cnb.csic.es/seq/scar1"/>
+    <sbol:version>1</sbol:version>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/scar1">
+    <dcterms:title>scar1</dcterms:title>
+    <sbol:displayId>scar1</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/scar1"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0001953"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/http://seva.cnb.csic.es/seq/scar1"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/AscI">
+    <dcterms:description>Seva AscI</dcterms:description>
+    <dcterms:title>AscI</dcterms:title>
+    <sbol:displayId>AscI</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/AscI"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0001687"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqAscI"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/cd/pBBR1">
+    <dcterms:description>Seva pBBR1</dcterms:description>
+    <dcterms:title>pBBR1</dcterms:title>
+    <sbol:displayId>pBBR1</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/cd/pBBR1"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000296"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/seq/seqpBBR1"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://seva.cnb.csic.es/ChnR_PchnB_seq/1">
+    <sbol:displayId>ChnR_PchnB_seq</sbol:displayId>
+    <sbol:elements>TTAATTAAAGCGGATAACAATTTCACACAGGAGGCCGCCTAGGCCGCGGCCGCGCGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGTCAAAAAACAATAGAGGAGACTGAATTTTCAGACACGAGATTGGTGTGTTCCTGTCTGATTTCGATGGGTGTTTTCCCAAAAAATTTTTGAAATACTCGGGTCATATGGCTCTGATCGCAAAAACCGGCTTCACTGGCAATCACTTTCAGTGGAATTTCTTTTTTTGAAGTGAGCAAACGTTTAGCAAATTGCACCCTGAGATTCATGATGTAGGCAGCAGGGGAATTACCAAAATCGACTTTAAATTTTCTCATTAAATGAGGCACGCTCATCTTGACTAATCCCGCTAAATCTTCGAGGGTAATTTTAATGCTCATGTTTTCATTGATAAATTCTAATAACAGTCTGCGTTGTAGGGGAGTAAAACCAGAACGGCACTGTCCTTCCTTAAAATCTAATTTGGCATACTGACGGAGTAAATGCAGGGCGATCTGGTTTTTAATGCTCTCTAAATACAGGTTTCCACCTAAACCACCTTGCTTTAATTCTAGTTCTAAAAGTGAAGTCAGAGCAGGTAAAACATGATCTTCCACACCGACTTCGTCTCTGATTCGGATCGAAGCGATATCATAATCAAACACCTTATTCGCCATTGAGGTGATGGAGTCATGCGAAATGTAGACATGGGTGACGGCAATATGGTCATTCCACGCCCAGCGGGAATCTTCACCACAGGTCAACAAGGAGACATAACCCGGCTTAACCACTTGGGTATCCCAAGAGGCATCGCCTTTTCTACGCATTTCCGCCGCACTTTTTTTATAGTTGACGATCATGTAGTCACGCATGGCAGGAATATGCACATCGAGGTTGGTATATTCGTACCCTCTGATTGCAATGTTTTCCCAACCGGCATTCATGCTGTCAATTGTGACATTACCCGGAATCCATAACACGACATCTTCGGGTTTGATCAGCGTATTTGCTTTGTCTGTGCTCATGCTAGCTTTTTCCTCCTTATAAAGTTAATCAACACCCCTTGTATTACTGTTTATGTAAGCAGACAGTTTTATTGTTCATGATGATATATTTTTATCTTGTGCAATGTAACATCAGAGATTTTGAGACACAAGACGTGGCAAAAAACATTATCCAGAACGGGAGTGCGCCTTGAGCGACACGAATTATGCAGTGATTTACGACCTGCACAGCCATACCACAGCTTCCGATGGCTGCCTGACGCCAGAAGCATTGGTGCACCGTGCAGTCGATGATAAGCTGTCAAACAGCGGATAACAATTTCACACAGGAGCAACTAAAAGAGATTGTTTGGATCAGTTACCCAAAATCGTTGAAAAGATTTTAACTCTTCGATTTTTATTTTTTAGGTAATCCTAGCCCTCTCGGGGGCTAGGATTAAAAATTTTAAGTTATTCCAACACGAATGACAAATTGTTCAATGCAAAATAAAAACATACAATATATAAATATATTTTTTAAATAAAACATAAGATTACAATAAAATAAGAATTTTTATTTGGAGTTTGTTTTTTTTCTACAATGATCATTATGTACAATTTTTAGGTTCACCCCATCCAAGCCTTGTGATTGCATTCCTGCGATTCTTTATTCAATGAATAAGCAATGCTATTAATCAGCAATGAATAACCAGCAGTGCAGATTTTGAATAAATTCACATGTCGTAATCCTAGGCCGCGGCCGCGCGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGGCATGCAAGCTTGCGGCCGCGTCGTGACTGGGAAAACCCTGGCGACTAGT</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB_seq"/>
+    <sbol:version>1</sbol:version>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/1">
+    <dcterms:title>ChnR_PchnB</dcterms:title>
+    <sbol:displayId>ChnR_PchnB</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB_seq/1"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/PacI/1">
+        <sbol:displayId>PacI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/PacI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/PacI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>8</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/PacI/r"/>
+            <sbol:start>1</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/R24/1">
+        <sbol:displayId>R24</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/R24"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/R24/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>32</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/R24/r"/>
+            <sbol:start>9</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/SfiI/1">
+        <sbol:displayId>SfiI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/SfiI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/SfiI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>45</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/SfiI/r"/>
+            <sbol:start>33</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/AvrII/1">
+        <sbol:displayId>AvrII</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/AvrII"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/AvrII/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>43</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/AvrII/r"/>
+            <sbol:start>38</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/NotI/1">
+        <sbol:displayId>NotI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/NotI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/NotI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>53</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/NotI/r"/>
+            <sbol:start>46</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/EcoRI/1">
+        <sbol:displayId>EcoRI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/EcoRI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/EcoRI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>61</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/EcoRI/r"/>
+            <sbol:start>56</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/SacI/1">
+        <sbol:displayId>SacI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/SacI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/SacI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>67</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/SacI/r"/>
+            <sbol:start>62</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/KpnI/1">
+        <sbol:displayId>KpnI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/KpnI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/KpnI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>73</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/KpnI/r"/>
+            <sbol:start>68</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/SmaI/1">
+        <sbol:displayId>SmaI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/SmaI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/SmaI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>77</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/SmaI/r"/>
+            <sbol:start>72</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/BamHI/1">
+        <sbol:displayId>BamHI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/BamHI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/BamHI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>82</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/BamHI/r"/>
+            <sbol:start>77</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/XbaI/1">
+        <sbol:displayId>XbaI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/XbaI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/XbaI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>88</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/XbaI/r"/>
+            <sbol:start>83</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/SalI/1">
+        <sbol:displayId>SalI</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/SalI"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/SalI/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>94</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/SalI/r"/>
+            <sbol:start>89</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/ChnR_PchnB/1">
+        <sbol:displayId>ChnR_PchnB</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/ChnR_PchnB"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/ChnR_PchnB/ChnR_PchnB/r/1">
+            <sbol:displayId>r</sbol:displayId>
+            <sbol:end>1855</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/ChnR_PchnB/r"/>
+            <sbol:start>101</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/1">
+    <dcterms:title>pSEVA_7_3_11</dcterms:title>
+    <sbol:displayId>pSEVA_7_3_11</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11"/>
+    <sbol:sequence rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11_seq/1"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/ChnR_PchnB_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/ChnR_PchnB/1"/>
+        <sbol:displayId>ChnR_PchnB_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/ChnR_PchnB_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/T0"/>
+        <sbol:displayId>T0_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/SanDI"/>
+        <sbol:displayId>SanDI_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/scar1"/>
+        <sbol:displayId>scar1_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/SwaI"/>
+        <sbol:displayId>SwaI_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/Tmp"/>
+        <sbol:displayId>Tmp_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/PshAI_v7"/>
+        <sbol:displayId>PshAI_v7_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/OriT"/>
+        <sbol:displayId>OriT_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/FseI"/>
+        <sbol:displayId>FseI_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/pBBR1"/>
+        <sbol:displayId>pBBR1_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/AscI"/>
+        <sbol:displayId>AscI_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/T1_0/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://seva.cnb.csic.es/cd/T1"/>
+        <sbol:displayId>T1_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T1_0"/>
+        <sbol:roleIntegration rdf:resource="http://sbols.org/v2#mergeRoles"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/ChnR_PchnB_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/ChnR_PchnB_0/1"/>
+        <sbol:displayId>ChnR_PchnB_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/ChnR_PchnB_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/ChnR_PchnB_annotation_0/ChnR_PchnB_annotation_0_range/1">
+            <sbol:displayId>ChnR_PchnB_annotation_0_range</sbol:displayId>
+            <sbol:end>1861</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/ChnR_PchnB_annotation_0/ChnR_PchnB_annotation_0_range"/>
+            <sbol:start>1</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_0/1"/>
+        <sbol:displayId>T0_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_annotation_0/T0_annotation_0_range/1">
+            <sbol:displayId>T0_annotation_0_range</sbol:displayId>
+            <sbol:end>1964</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_annotation_0/T0_annotation_0_range"/>
+            <sbol:start>1862</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_0/1"/>
+        <sbol:displayId>SanDI_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_annotation_0/SanDI_annotation_0_range/1">
+            <sbol:displayId>SanDI_annotation_0_range</sbol:displayId>
+            <sbol:end>1971</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_annotation_0/SanDI_annotation_0_range"/>
+            <sbol:start>1965</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_0/1"/>
+        <sbol:displayId>scar1_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_annotation_0/scar1_annotation_0_range/1">
+            <sbol:displayId>scar1_annotation_0_range</sbol:displayId>
+            <sbol:end>1990</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_annotation_0/scar1_annotation_0_range"/>
+            <sbol:start>1972</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_0/1"/>
+        <sbol:displayId>SwaI_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_annotation_0/SwaI_annotation_0_range/1">
+            <sbol:displayId>SwaI_annotation_0_range</sbol:displayId>
+            <sbol:end>1998</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_annotation_0/SwaI_annotation_0_range"/>
+            <sbol:start>1991</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_0/1"/>
+        <sbol:displayId>Tmp_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_annotation_0/Tmp_annotation_0_range/1">
+            <sbol:displayId>Tmp_annotation_0_range</sbol:displayId>
+            <sbol:end>2583</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_annotation_0/Tmp_annotation_0_range"/>
+            <sbol:start>1999</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_0/1"/>
+        <sbol:displayId>PshAI_v7_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_annotation_0/PshAI_v7_annotation_0_range/1">
+            <sbol:displayId>PshAI_v7_annotation_0_range</sbol:displayId>
+            <sbol:end>2593</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_annotation_0/PshAI_v7_annotation_0_range"/>
+            <sbol:start>2584</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_0/1"/>
+        <sbol:displayId>OriT_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_annotation_0/OriT_annotation_0_range/1">
+            <sbol:displayId>OriT_annotation_0_range</sbol:displayId>
+            <sbol:end>2839</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_annotation_0/OriT_annotation_0_range"/>
+            <sbol:start>2594</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_0/1"/>
+        <sbol:displayId>FseI_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_annotation_0/FseI_annotation_0_range/1">
+            <sbol:displayId>FseI_annotation_0_range</sbol:displayId>
+            <sbol:end>2847</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_annotation_0/FseI_annotation_0_range"/>
+            <sbol:start>2840</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_0/1"/>
+        <sbol:displayId>pBBR1_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_annotation_0/pBBR1_annotation_0_range/1">
+            <sbol:displayId>pBBR1_annotation_0_range</sbol:displayId>
+            <sbol:end>4369</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_annotation_0/pBBR1_annotation_0_range"/>
+            <sbol:start>2848</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_0/1"/>
+        <sbol:displayId>AscI_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_annotation_0/AscI_annotation_0_range/1">
+            <sbol:displayId>AscI_annotation_0_range</sbol:displayId>
+            <sbol:end>4377</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_annotation_0/AscI_annotation_0_range"/>
+            <sbol:start>4370</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/T1_annotation_0/1">
+        <sbol:component rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T1_0/1"/>
+        <sbol:displayId>T1_annotation_0</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T1_annotation_0"/>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/T1_annotation_0/T1_annotation_0_range/1">
+            <sbol:displayId>T1_annotation_0_range</sbol:displayId>
+            <sbol:end>4489</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+            <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T1_annotation_0/T1_annotation_0_range"/>
+            <sbol:start>4378</sbol:start>
+            <sbol:version>1</sbol:version>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint1/1">
+        <sbol:displayId>constraint1</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/ChnR_PchnB_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint2/1">
+        <sbol:displayId>constraint2</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint2"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T0_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint3/1">
+        <sbol:displayId>constraint3</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint3"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SanDI_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint4/1">
+        <sbol:displayId>constraint4</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint4"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/scar1_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint5/1">
+        <sbol:displayId>constraint5</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint5"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/SwaI_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint6/1">
+        <sbol:displayId>constraint6</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint6"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/Tmp_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint7/1">
+        <sbol:displayId>constraint7</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint7"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/PshAI_v7_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint8/1">
+        <sbol:displayId>constraint8</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint8"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/OriT_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint9/1">
+        <sbol:displayId>constraint9</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint9"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/FseI_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint10/1">
+        <sbol:displayId>constraint10</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint10"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/pBBR1_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint11/1">
+        <sbol:displayId>constraint11</sbol:displayId>
+        <sbol:object rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/T1_0/1"/>
+        <sbol:persistentIdentity rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/constraint11"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://seva.cnb.csic.es/pSEVA_7_3_11/AscI_0/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+  </sbol:ComponentDefinition>
+</rdf:RDF>
